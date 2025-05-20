@@ -52,8 +52,7 @@ async def get_ingestion_documents():
 
 @ingestion.get("/ingestion/{uid}")
 async def get_document(uid):
-    document = db.get_document(id)
+    document = db.get_document(uid)
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {uid} not found")
     return document
-

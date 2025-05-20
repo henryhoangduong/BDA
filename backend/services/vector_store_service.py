@@ -138,3 +138,7 @@ class VectorStoreService:
             )
             store.save_local(settings.paths.faiss_index_dir)
         return store
+    
+    def chunk_in_store(self, chunk_id:  str)->bool:
+        index_to_docstore_id = self.store.index_to_docstore_id
+        return chunk_id in index_to_docstore_id.values()

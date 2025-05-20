@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.ingestion_routes import ingestion
+from api.embedding_routes import embedding_route
 from api.parsing_routes import parsing
 from core.config import settings
 from core.utils.logger import setup_logging
@@ -69,8 +70,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(parsing)
-app.include_router(ingestion)
+app.include_router(parsing,tags=["Parse"])
+app.include_router(ingestion, tags=["Ingestion"])
+app.include_router(embedding_route, tags=["Embedding"])
 
 if __name__ == "__main__":
     import uvicorn
