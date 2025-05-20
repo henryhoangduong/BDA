@@ -43,3 +43,17 @@ async def ingest_document(
         logger.error(f"Error in ingest_document: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     
+
+@ingestion.get("/ingestion")
+async def get_ingestion_documents():
+    documents = db.get_all_documents()
+    return documents
+
+
+@ingestion.get("/ingestion/{uid}")
+async def get_document(uid):
+    document = db.get_document(id)
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {uid} not found")
+    return document
+
