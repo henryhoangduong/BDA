@@ -3,7 +3,8 @@ import os
 
 import torch
 
-from core.celery_config import celery_app as celery  # Rename for backward compatibility
+from core.celery_config import \
+    celery_app as celery  # Rename for backward compatibility
 from core.factories.database_factory import get_database
 from core.factories.vector_store_factory import VectorStoreFactory
 from services.parser_service import ParserService

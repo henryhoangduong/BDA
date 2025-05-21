@@ -5,13 +5,9 @@ from typing import List
 import cv2
 from langchain.schema import Document
 from langchain_community.document_loaders import (
-    TextLoader,
-    UnstructuredExcelLoader,
-    UnstructuredMarkdownLoader,
-    UnstructuredPDFLoader,
-    UnstructuredPowerPointLoader,
-    UnstructuredWordDocumentLoader,
-)
+    TextLoader, UnstructuredExcelLoader, UnstructuredMarkdownLoader,
+    UnstructuredPDFLoader, UnstructuredPowerPointLoader,
+    UnstructuredWordDocumentLoader)
 
 
 class Loader:

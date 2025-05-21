@@ -7,9 +7,9 @@ from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 
 from core.config import settings
 from core.factories.database_factory import get_database
-from services.ingestion_service.document_ingestion_service import (
-    DocumentIngestionService,
-)
+from models.simbadoc import SimbaDoc
+from services.ingestion_service.document_ingestion_service import \
+    DocumentIngestionService
 from services.ingestion_service.file_handling import save_file_locally
 
 ingestion_service = DocumentIngestionService()
@@ -62,3 +62,15 @@ async def get_document(uid):
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {uid} not found")
     return document
+
+
+@ingestion.put("/ingestion/update_document")
+async def update_document(doc_id:str, simba_doc:SimbaDoc):
+    try:
+        success = db.update_document(doc_id,simba_doc)
+
+        if not success:
+            raise HTTPException(status_code=404, detail=f"Document {doc_id} not found")
+    except Exception as e:
+        logger.error(f"Error in update_document: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

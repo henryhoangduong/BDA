@@ -9,7 +9,8 @@ from core.config import settings
 from core.factories.database_factory import get_database
 from models.simbadoc import SimbaDoc
 from services.parser_service import ParserService
-from tasks.parsing_tasks import celery, parse_docling_task, parse_markitdown_task
+from tasks.parsing_tasks import (celery, parse_docling_task,
+                                 parse_markitdown_task)
 
 logger = logging.getLogger(__name__)
 parsing = APIRouter()
