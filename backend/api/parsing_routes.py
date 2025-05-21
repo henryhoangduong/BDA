@@ -9,18 +9,19 @@ from core.config import settings
 from core.factories.database_factory import get_database
 from models.simbadoc import SimbaDoc
 from services.parser_service import ParserService
-from tasks.parsing_tasks import (celery, parse_docling_task,
-                                 parse_markitdown_task)
+from tasks.parsing_tasks import celery, parse_docling_task, parse_markitdown_task
 
-logger= logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 parsing = APIRouter()
 
 parser_service = ParserService()
 db = get_database()
 
+
 class ParseDocumentRequest(BaseModel):
     document_id: str
     parser: str
+
 
 @parsing.get("/parsers")
 async def get_parsers():
@@ -28,16 +29,17 @@ async def get_parsers():
     parsers = parser_service.get_parsers()
     return {"parsers": parsers}
 
+
 @parsing.post("/parses")
 async def parse_document(request: ParseDocumentRequest):
     if not settings.features.enable_parsers:
         raise HTTPException(
             status_code=501,
-            detail="Document parsing is disabled in system configuration"
+            detail="Document parsing is disabled in system configuration",
         )
     try:
         logger.info(f"Received parse request: {request}")
-        
+
         # Verify document exists first
         simbadoc: SimbaDoc = db.get_document(request.document_id)
         if not simbadoc:
@@ -57,26 +59,27 @@ async def parse_document(request: ParseDocumentRequest):
         logger.error(f"Error queuing parsing task: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @parsing.get("/parsing/tasks")
 async def get_all_tasks():
     """Get all Celery tasks (active, reserved, scheduled)"""
     try:
         i = Inspect(app=celery)
         tasks = {
-            'active': i.active(),  # Currently executing tasks
-            'reserved': i.reserved(),  # Tasks that have been claimed by workers
-            'scheduled': i.scheduled(),  # Tasks scheduled for later execution
-            'registered': i.registered()  # All tasks registered in the worker
+            "active": i.active(),  # Currently executing tasks
+            "reserved": i.reserved(),  # Tasks that have been claimed by workers
+            "scheduled": i.scheduled(),  # Tasks scheduled for later execution
+            "registered": i.registered(),  # All tasks registered in the worker
         }
-        
+
         # Add task queue length if available
         try:
             stats = celery.control.inspect().stats()
             if stats:
-                tasks['stats'] = stats
+                tasks["stats"] = stats
         except:
             pass
-            
+
         return tasks
     except Exception as e:
         logger.error(f"Error fetching tasks: {str(e)}")

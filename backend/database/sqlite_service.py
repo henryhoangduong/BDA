@@ -12,32 +12,30 @@ logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
+
 # Separate SQLAlchemy model
-class DocumentModel():
-    __tablename__ = 'documents'
-    
+class DocumentModel:
+    __tablename__ = "documents"
+
     id = Column(String, primary_key=True)
     documents = Column(JSON)
     metadata = Column(JSON)
 
     def to_simba_doc(self) -> SimbaDoc:
         """Convert to SimbaDoc"""
-        return SimbaDoc(
-            id=self.id,
-            documents=self.documents,
-            metadata=self.metadata
-        )
+        return SimbaDoc(id=self.id, documents=self.documents, metadata=self.metadata)
 
     @classmethod
-    def from_simba_doc(cls, doc: SimbaDoc) -> 'DocumentModel':
+    def from_simba_doc(cls, doc: SimbaDoc) -> "DocumentModel":
         """Create from SimbaDoc"""
         return cls(
             id=doc.id,
             documents=[d.dict() for d in doc.documents],
-            metadata=doc.metadata.dict()
+            metadata=doc.metadata.dict(),
         )
 
-class SQLiteDocumentDB():
+
+class SQLiteDocumentDB:
     _instance = None
 
     def __new__(cls):
@@ -50,7 +48,7 @@ class SQLiteDocumentDB():
         """Initialize the SQLite database"""
         try:
             db_path = Path(settings.paths.upload_dir) / "documents.db"
-            self.engine = create_engine(f'sqlite:///{db_path}')
+            self.engine = create_engine(f"sqlite:///{db_path}")
             Base.metadata.create_all(self.engine)
             self.Session = sessionmaker(bind=self.engine)
             logger.info(f"Initialized SQLite DB at {db_path}")
@@ -64,11 +62,11 @@ class SQLiteDocumentDB():
             session = self.Session()
             if not isinstance(documents, list):
                 documents = [documents]
-            
+
             db_docs = [DocumentModel.from_simba_doc(doc) for doc in documents]
             for doc in db_docs:
                 session.add(doc)
-            
+
             session.commit()
             return [doc.id for doc in documents]
         except Exception as e:
@@ -120,7 +118,9 @@ class SQLiteDocumentDB():
         """Update a document by ID"""
         try:
             session = self.Session()
-            result = session.query(DocumentModel).filter_by(id=document_id).update(updates)
+            result = (
+                session.query(DocumentModel).filter_by(id=document_id).update(updates)
+            )
             session.commit()
             return result > 0
         except Exception as e:
@@ -130,6 +130,7 @@ class SQLiteDocumentDB():
         finally:
             session.close()
 
+
 if __name__ == "__main__":
     db = SQLiteDocumentDB()
     from langchain_core.documents import Document
@@ -138,26 +139,26 @@ if __name__ == "__main__":
 
     # Test single document
     doc1 = SimbaDoc(
-        id='1',
-        documents=[Document(page_content='test1')],
-        metadata=MetadataType(file_name='test1.txt')
+        id="1",
+        documents=[Document(page_content="test1")],
+        metadata=MetadataType(file_name="test1.txt"),
     )
-    
+
     # Test multiple documents
     docs = [
         SimbaDoc(
-            id='2',
-            documents=[Document(page_content='test2')],
-            metadata=MetadataType(file_name='test2.txt')
+            id="2",
+            documents=[Document(page_content="test2")],
+            metadata=MetadataType(file_name="test2.txt"),
         ),
         SimbaDoc(
-            id='3',
-            documents=[Document(page_content='test3')],
-            metadata=MetadataType(file_name='test3.txt')
-        )
+            id="3",
+            documents=[Document(page_content="test3")],
+            metadata=MetadataType(file_name="test3.txt"),
+        ),
     ]
-    
+
     # Insert and test
     print("Inserting single document:", db.insert_documents(doc1))
     print("Inserting multiple documents:", db.insert_documents(docs))
-    print("All documents:", db.get_all_documents()) 
+    print("All documents:", db.get_all_documents())

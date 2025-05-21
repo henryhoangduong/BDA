@@ -205,4 +205,4 @@ if __name__ == "__main__":
     print(f"Base Directory: {settings.paths.base_dir}")
     print(f"Vector Store Provider: {settings.vector_store.provider}")
     print(f"Embedding Model: {settings.embedding.model_name}")
-    print("Celery: ",settings.celery)
+    print("Celery: ", settings.celery)

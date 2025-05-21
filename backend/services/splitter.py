@@ -10,7 +10,7 @@ from core.factories.embeddings_factory import get_embeddings
 class Splitter:
     def __init__(self):
 
-        self.strategy = "recursive_character" # TODO: Make this configurable
+        self.strategy = "recursive_character"  # TODO: Make this configurable
 
     def split_document(self, documents: List[Document]) -> List[Document]:
         if self.strategy == "recursive_character":
@@ -20,25 +20,31 @@ class Splitter:
         else:
             raise ValueError(f"Invalid strategy: {self.strategy}")
 
-    def recursive_character_text_splitter(self, documents: List[Document]) -> List[Document]:
-        
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=400)  # TODO: Make these parameters configurable
-        
+    def recursive_character_text_splitter(
+        self, documents: List[Document]
+    ) -> List[Document]:
+
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1500, chunk_overlap=400
+        )  # TODO: Make these parameters configurable
+
         # Check if input is a list and contains Document objects
-        if not isinstance(documents, list) or not all(isinstance(doc, Document) for doc in documents):
+        if not isinstance(documents, list) or not all(
+            isinstance(doc, Document) for doc in documents
+        ):
             raise ValueError("Input must be a list of LangChain Document objects")
-        
+
         # Split the documents into chunks
         chunks = text_splitter.split_documents(documents)
-        
+
         return chunks
-    
+
     def semantic_chunking(self, documents: List[Document]) -> List[Document]:
-        
+
         embedder = get_embeddings()
         splitter = SemanticChunker(
             embedder,
             breakpoint_threshold_type="percentile",
-            breakpoint_threshold_amount=0.8
+            breakpoint_threshold_amount=0.8,
         )
         return splitter.create_documents(documents[0].page_content)

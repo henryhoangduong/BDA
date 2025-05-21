@@ -102,31 +102,42 @@ class VectorStoreService:
     def _initialize_faiss(self):
         try:
             # Try to get dimension from HuggingFace embeddings
-            if hasattr(self.embeddings, 'client') and hasattr(self.embeddings.client, 'dimension'):
+            if hasattr(self.embeddings, "client") and hasattr(
+                self.embeddings.client, "dimension"
+            ):
                 embedding_dim = self.embeddings.client.dimension
-            elif hasattr(self.embeddings, 'model') and hasattr(self.embeddings.model, 'config'):
+            elif hasattr(self.embeddings, "model") and hasattr(
+                self.embeddings.model, "config"
+            ):
                 embedding_dim = self.embeddings.model.config.hidden_size
             else:
                 # Fallback for other embedding types: compute dimension from a test embedding
                 embedding_dim = len(self.embeddings.embed_query("test"))
-            
+
             logger.info(f"Using embedding dimension: {embedding_dim}")
         except Exception as e:
             logger.error(f"Error determining embedding dimension: {e}")
             # Fallback to computing dimension
             embedding_dim = len(self.embeddings.embed_query("test"))
-            logger.info(f"Fallback: Using computed embedding dimension: {embedding_dim}")
+            logger.info(
+                f"Fallback: Using computed embedding dimension: {embedding_dim}"
+            )
 
-        if os.path.exists(settings.paths.faiss_index_dir) and len(os.listdir(settings.paths.faiss_index_dir)) > 0:
+        if (
+            os.path.exists(settings.paths.faiss_index_dir)
+            and len(os.listdir(settings.paths.faiss_index_dir)) > 0
+        ):
             logging.info("Loading existing FAISS vector store")
             store = FAISS.load_local(
                 settings.paths.faiss_index_dir,
                 self.embeddings,
-                allow_dangerous_deserialization=True
+                allow_dangerous_deserialization=True,
             )
             # Verify dimension match
             if store.index.d != embedding_dim:
-                raise ValueError(f"Embedding dimension mismatch: Index has {store.index.d}D vs Model has {embedding_dim}D")
+                raise ValueError(
+                    f"Embedding dimension mismatch: Index has {store.index.d}D vs Model has {embedding_dim}D"
+                )
         else:
             logging.info(f"Initializing new FAISS index with dimension {embedding_dim}")
             index = faiss.IndexFlatL2(embedding_dim)
@@ -138,7 +149,7 @@ class VectorStoreService:
             )
             store.save_local(settings.paths.faiss_index_dir)
         return store
-    
-    def chunk_in_store(self, chunk_id:  str)->bool:
+
+    def chunk_in_store(self, chunk_id: str) -> bool:
         index_to_docstore_id = self.store.index_to_docstore_id
         return chunk_id in index_to_docstore_id.values()
