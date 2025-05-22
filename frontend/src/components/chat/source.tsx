@@ -9,7 +9,7 @@ interface Source {
 interface SourcesProps {
   sources: Source[]
 }
-const Sources: React.FC<SourcesProps> = ({ sources }) => {
+export const Sources: React.FC<SourcesProps> = ({ sources }) => {
   if (!sources || sources.length == 0) return null
   const uniqueSources = Array.from(new Set(sources.map((s) => s.file_name))).map((fileName) => ({
     file_name: fileName
