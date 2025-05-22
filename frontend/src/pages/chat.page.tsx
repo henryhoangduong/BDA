@@ -1,24 +1,13 @@
 import ChatFrame from '@/components/chat/chat-frame'
 import { Message } from '@/types/chat'
+import { useState } from 'react'
 
 const ChatPage = () => {
-  const messages: Message[] = [
-    {
-      id: 'id-1234',
-      role: 'assistant',
-      content: 'content',
-      state: { sources: [{ file_name: 'abdc.pdf' }] },
-      followUpQuestions: ['what is this']
-    },
-    {
-      id: 'id-234',
-      role: 'user',
-      content: 'conent'
-    }
-  ]
+  const [messages, setMessages] = useState<Message[]>([])
+
   return (
-    <div>
-      <ChatFrame messages={messages} />
+    <div className='p-6 h-[100vh]'>
+      <ChatFrame messages={messages} setMessages={setMessages} />
     </div>
   )
 }
