@@ -35,4 +35,5 @@ dependencies = [
     "numpy>=1.26.4",
     "opencv-python>=4.6.0.66",
     "opencv-python-headless>=4.11.0.86",
+    "autopep8>=2.3.2",
 ]

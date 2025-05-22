@@ -1,20 +1,20 @@
+from core.utils.logger import setup_logging
+from core.config import settings
+from api.parsing_routes import parsing
+from api.ingestion_routes import ingestion
+from api.embedding_routes import embedding_route
+from api.chat_routes import chat
+from api.database_routes import database_route
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+from dotenv import load_dotenv
+from contextlib import asynccontextmanager
+import logging
 import os
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
-import logging
-from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from api.chat_routes import chat
-from api.embedding_routes import embedding_route
-from api.ingestion_routes import ingestion
-from api.parsing_routes import parsing
-from core.config import settings
-from core.utils.logger import setup_logging
 
 load_dotenv()
 
@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 
 logger.info("=" * 50)
 logger.info("Initializing Application Settings")
-logger.info(f"TOKENIZERS_PARALLELISM set to: {os.environ['TOKENIZERS_PARALLELISM']}")
+logger.info(
+    f"TOKENIZERS_PARALLELISM set to: {os.environ['TOKENIZERS_PARALLELISM']}")
 logger.info("=" * 50)
 
 
@@ -75,6 +76,7 @@ app.include_router(parsing, tags=["Parse"])
 app.include_router(ingestion, tags=["Ingestion"])
 app.include_router(embedding_route, tags=["Embedding"])
 app.include_router(chat, tags=["Chat"])
+app.include_router(database_route, tags=["Database"])
 
 if __name__ == "__main__":
     import uvicorn
