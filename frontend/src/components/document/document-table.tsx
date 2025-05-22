@@ -1,21 +1,13 @@
 import React, { useEffect } from 'react'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardHeader } from '../ui/card'
 import { ingestionQueryFn } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import FileActions from './file-actions'
 import { Switch } from '../ui/switch'
 import { FileText } from 'lucide-react'
-
+import FileInformation from './file-information'
+import ParsingStatus from './parsing-status'
 interface Props {
   uploadButton?: React.ReactNode
 }
@@ -49,16 +41,23 @@ const DocumentTable = ({ uploadButton }: Props) => {
             const year = date.getFullYear()
             return (
               <TableRow key={index}>
-                <TableCell className='flex flex-row items-center gap-2 font-semibold text-left cursor-pointer'>
-                  <FileText />
-                  {item.metadata.filename}
-                </TableCell>
+                <FileInformation
+                  trigger={
+                    <TableCell className='flex flex-row items-center gap-2 font-semibold text-left cursor-pointer'>
+                      <FileText />
+                      {item.metadata.filename}
+                    </TableCell>
+                  }
+                />
+
                 <TableCell className='text-center'>{item.metadata.chunk_number}</TableCell>
                 <TableCell className='text-center'>{`${day}/${month}/${year}`}</TableCell>
                 <TableCell className='text-center'>
                   <Switch checked={item.metadata.enabled} />
                 </TableCell>
-                <TableCell className='text-center'>{`${day}/${month}/${year}`}</TableCell>
+                <TableCell className='text-center'>
+                  <ParsingStatus status={(item.metadata.parsing_status as string) || ''} />
+                </TableCell>
                 <TableCell className='text-center'>
                   <FileActions />
                 </TableCell>

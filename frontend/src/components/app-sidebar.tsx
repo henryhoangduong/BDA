@@ -1,4 +1,14 @@
-import { Home, Terminal, PlugZap, Key, Settings, HelpCircle, HardDrive } from 'lucide-react'
+import {
+  Home,
+  Terminal,
+  PlugZap,
+  Key,
+  Settings,
+  HelpCircle,
+  HardDrive,
+  ChartAreaIcon,
+  MessageCircle
+} from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -10,17 +20,13 @@ import {
   SidebarMenuItem
 } from '@/components/ui/sidebar'
 const sidebarItems = [
-  { title: 'Home', icon: Home, url: '/' },
+  { title: 'Chat', icon: MessageCircle, url: '/' },
   { title: 'Documents', icon: Terminal, url: '/documents' },
   { title: 'Plugins', icon: PlugZap, url: '/plugins' },
   { title: 'API Keys', icon: Key, url: '/api-keys' },
   { title: 'Settings', icon: Settings, url: '/settings' }
 ]
 
-const bottomItems = [
-  { title: 'Help', icon: HelpCircle, url: '/help' },
-  { title: 'Storage', icon: HardDrive, url: '/storage' }
-]
 const AppSidebar = () => {
   return (
     <Sidebar>
