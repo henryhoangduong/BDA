@@ -25,6 +25,7 @@ const DocumentManagement = () => {
           title: 'Success',
           description: 'File uploaded'
         })
+        handleModal()
         queryClient.invalidateQueries({ queryKey: ['ingestion-documents'] })
       },
       onError: (error) => {

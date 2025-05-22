@@ -79,7 +79,6 @@ export function FileUploadModal({ isOpen, onClose, onUpload, isUploading = false
   const handleUpload = async () => {
     if (selectedFiles) {
       await onUpload(selectedFiles)
-      onClose()
     }
   }
 
