@@ -12,7 +12,7 @@ db = get_database()
 store = VectorStoreFactory.get_vector_store()
 
 
-@embedding_route.post("/embed/document")
+@embedding_route.post("/embed/document/{doc_id}")
 async def embed_document(doc_id: str):
     try:
         simbadoc: SimbaDoc = db.get_document(doc_id)

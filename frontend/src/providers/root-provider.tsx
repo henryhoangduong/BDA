@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { config } from '@/config/config'
 import { toast } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
+import { Worker } from '@react-pdf-viewer/core'
+
 const RootProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = new QueryClient()
   useEffect(() => {
@@ -17,7 +19,7 @@ const RootProvider = ({ children }: { children: ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
-        {children}
+        <Worker workerUrl='https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js'>{children} </Worker>
         <Toaster />
       </SidebarProvider>
     </QueryClientProvider>

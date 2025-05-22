@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardHeader } from '../ui/card'
-import { ingestionQueryFn } from '@/lib/api'
-import { useQuery } from '@tanstack/react-query'
+import { embeddingDocumentByIdMutationFn, ingestionQueryFn } from '@/lib/api'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import FileActions from './file-actions'
 import { Switch } from '../ui/switch'
 import { FileText } from 'lucide-react'
 import FileInformation from './file-information'
 import ParsingStatus from './parsing-status'
+import { toast } from '@/hooks/use-toast'
 interface Props {
   uploadButton?: React.ReactNode
 }
@@ -17,7 +18,33 @@ const DocumentTable = ({ uploadButton }: Props) => {
     queryKey: ['ingestion-documents'],
     queryFn: ingestionQueryFn
   })
+  const { mutate, isPending } = useMutation({
+    mutationFn: embeddingDocumentByIdMutationFn
+  })
+  const queryClient = useQueryClient()
+  const handleEmbedding = (value: string) => {
+    if (isPending) return
 
+    mutate(value, {
+      onSuccess: () => {
+        toast({
+          variant: 'default',
+          title: 'Successsful',
+          description: 'Document embedded'
+        })
+        queryClient.invalidateQueries({
+          queryKey: ['ingestion-documents']
+        })
+      },
+      onError: (error) => {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: error.message
+        })
+      }
+    })
+  }
   return (
     <Card className='p-6'>
       <CardHeader>{uploadButton}</CardHeader>
@@ -39,21 +66,32 @@ const DocumentTable = ({ uploadButton }: Props) => {
             const day = date.getDate() // 22
             const month = date.getMonth() + 1 // 5  (months are zero-indexed)
             const year = date.getFullYear()
+            const raw = item.metadata.file_path
+            const fsPath = raw.replace(/^.*(\/Users\/.*)$/, '$1')
+            const fileUrl = `file://${raw}`
+
             return (
               <TableRow key={index}>
                 <FileInformation
                   trigger={
-                    <TableCell className='flex flex-row items-center gap-2 font-semibold text-left cursor-pointer'>
+                    <TableCell className='flex flex-row items-center gap-2 font-semibold text-left cursor-pointer hover:underline'>
                       <FileText />
                       {item.metadata.filename}
                     </TableCell>
                   }
+                  doc_id={item.id}
                 />
 
                 <TableCell className='text-center'>{item.metadata.chunk_number}</TableCell>
                 <TableCell className='text-center'>{`${day}/${month}/${year}`}</TableCell>
                 <TableCell className='text-center'>
-                  <Switch checked={item.metadata.enabled} />
+                  <Switch
+                    onCheckedChange={() => {
+                      if (item.metadata.enabled) return
+                      handleEmbedding(item.id)
+                    }}
+                    checked={item.metadata.enabled}
+                  />
                 </TableCell>
                 <TableCell className='text-center'>
                   <ParsingStatus status={(item.metadata.parsing_status as string) || ''} />

@@ -8,5 +8,14 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+  server: {
+    proxy: {
+      '/pdf': {
+        target: 'https://www.tutorialspoint.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/pdf/, '')
+      }
+    }
   }
 })

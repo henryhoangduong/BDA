@@ -20,8 +20,8 @@ export const ingestionQueryFn = async (): Promise<SimbaDoc[]> => {
   const res = await API.get('ingestion')
   return res.data
 }
-export const ingestionByIdQueryFn = async () => {
-  const res = await API.get('')
+export const ingestionByIdQueryFn = async (doc_id: string): Promise<SimbaDoc> => {
+  const res = await API.get(`ingestion/${doc_id}`)
   return res.data
 }
 export const ingestionTasksQueryFn = async () => {
@@ -113,3 +113,8 @@ export async function handleChatStream(
 }
 
 //***************************** DATABASE *****************************
+//***************************** EMBEDDING *****************************
+export const embeddingDocumentByIdMutationFn = async (doc_id: string) => {
+  const res = await API.post(`embed/document/${doc_id}`)
+  return res.data
+}
