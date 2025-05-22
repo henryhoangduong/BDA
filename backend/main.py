@@ -67,16 +67,16 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(parsing, tags=["Parse"])
-app.include_router(ingestion, tags=["Ingestion"])
-app.include_router(embedding_route, tags=["Embedding"])
-app.include_router(chat, tags=["Chat"])
-app.include_router(database_route, tags=["Database"])
+app.include_router(parsing, tags=["Parse"], prefix="/api")
+app.include_router(ingestion, tags=["Ingestion"], prefix="/api")
+app.include_router(embedding_route, tags=["Embedding"], prefix="/api")
+app.include_router(chat, tags=["Chat"], prefix="/api")
+app.include_router(database_route, tags=["Database"], prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn

@@ -36,4 +36,6 @@ dependencies = [
     "opencv-python>=4.6.0.66",
     "opencv-python-headless>=4.11.0.86",
     "autopep8>=2.3.2",
+    "chromadb>=0.6.3",
+    "langchain-chroma>=0.2.3",
 ]

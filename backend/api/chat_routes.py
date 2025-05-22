@@ -7,7 +7,8 @@ from pydantic import BaseModel
 
 from services.chatbots.chat4u.graph import graph
 from services.chatbots.chat4u.state import State, for_client
-
+import logging
+logger = logging.getLogger(__name__)
 chat = APIRouter()
 
 
@@ -35,7 +36,7 @@ async def invoke_graph(query: Query = Body(...)):
         try:
             buffer = ""
             last_state = None
-
+            print("last_state: ", last_state)
             async for event in graph.astream_events(state, version="v2", config=config):
                 metadata = event.get("metadata", {})
                 event_type = event.get("event")
@@ -62,6 +63,7 @@ async def invoke_graph(query: Query = Body(...)):
                     # Send the latest state that now includes documents
                     yield f"{json.dumps({'state': last_state})}\n\n"
         except Exception as e:
+            logger.error("Error invoking graph: ", e)
             yield f"{json.dumps({'error': str(e)})}\n\n"
         finally:
             print("Done")

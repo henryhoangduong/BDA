@@ -19,4 +19,4 @@ def generate(state):
     )
     message = state["messages"] + [AIMessage(content=generation)]
 
-    return {"documents": documents, "messages": messages}
+    return {"documents": documents, "messages": message}

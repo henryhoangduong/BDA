@@ -30,7 +30,7 @@ class VectorStoreService:
         elif settings.vector_store.provider == "chroma":
             self.store = self._initialize_chroma()
 
-    def as_retiever(self, **kwargs):
+    def as_retriever(self, **kwargs):
         return self.store.as_retriever(**kwargs)
 
     def save(self):
@@ -74,14 +74,15 @@ class VectorStoreService:
         return all_documents
 
     def add_documents(self, documents: List[Document]) -> bool:
+        """Add documents with proper synchronization"""
         try:
             for doc in documents:
                 if self.chunk_in_store(doc.id):
                     print(f"Document {doc.id} already in store")
                     return False
                 else:
-                    print(f"Document {doc.id} already in store")
-                    return False
+                    print(f"Adding {doc.id} to store")
+
             self.store.add_documents(documents)
             self.save()
             return True
@@ -94,7 +95,6 @@ class VectorStoreService:
         store = Chroma.from_documents(
             documents=documents or [Document(page_content="hello world")],
             embedding=self.embeddings,
-            allow_dangerous_deserialization=True,
         )
         store.save_local(settings.paths.faiss_index_dir)
         return store
@@ -139,7 +139,8 @@ class VectorStoreService:
                     f"Embedding dimension mismatch: Index has {store.index.d}D vs Model has {embedding_dim}D"
                 )
         else:
-            logging.info(f"Initializing new FAISS index with dimension {embedding_dim}")
+            logging.info(
+                f"Initializing new FAISS index with dimension {embedding_dim}")
             index = faiss.IndexFlatL2(embedding_dim)
             store = FAISS(
                 embedding_function=self.embeddings,
