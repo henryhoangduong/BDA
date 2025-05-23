@@ -97,7 +97,7 @@ const DocumentTable = ({ uploadButton }: Props) => {
                   <ParsingStatus status={(item.metadata.parsing_status as string) || ''} />
                 </TableCell>
                 <TableCell className='text-center'>
-                  <FileActions />
+                  <FileActions doc_id={item.id} />
                 </TableCell>
               </TableRow>
             )

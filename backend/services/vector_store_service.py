@@ -154,3 +154,14 @@ class VectorStoreService:
     def chunk_in_store(self, chunk_id: str) -> bool:
         index_to_docstore_id = self.store.index_to_docstore_id
         return chunk_id in index_to_docstore_id.values()
+
+    def delete_documents(self, uids: List[str]) -> bool:
+        try:
+            logger.info(f"Deleting documents: {uids}")
+            self.store.delete(uids)
+            self.save()
+
+            return True
+        except Exception as e:
+            logger.error("Error deleting documents: ", e)
+            raise e

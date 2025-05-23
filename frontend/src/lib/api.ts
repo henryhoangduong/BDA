@@ -28,7 +28,10 @@ export const ingestionTasksQueryFn = async () => {
   const res = await API.put('')
   return res.data
 }
-
+export const ingestionDeleteMutationFn = async (doc_ids: string[]) => {
+  const res = await API.delete(`ingestion`, { data: doc_ids })
+  return res.data
+}
 //***************************** CHAT *****************************
 export async function sendMessage(message: string): Promise<Response> {
   try {

@@ -31,6 +31,9 @@ const FileInformation = ({ trigger, doc_id }: Props) => {
           </CardHeader>
           <CardContent>
             <dl className='grid grid-cols-2 gap-x-4 gap-y-2'>
+              <dt className='font-medium text-sm text-gray-700'>ID</dt>
+              <dd className='text-sm font-semibold text-muted-foreground'>{data?.id}</dd>
+
               <dt className='font-medium text-sm text-gray-700'>Filename</dt>
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.filename}</dd>
 
