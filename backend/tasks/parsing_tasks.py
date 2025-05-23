@@ -67,6 +67,7 @@ def parse_docling_task(document_id: str):
         with torch.no_grad():  # Disable gradient computation
             parsed_simba_doc = parser_service.parse_document(original_doc, "docling")
 
+        db.update_document(document_id, parsed_simba_doc)
         vector_store.add_documents(parsed_simba_doc.documents)
         print("---")
         print("adding documents to store : ", parsed_simba_doc.documents)

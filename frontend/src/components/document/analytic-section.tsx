@@ -38,7 +38,7 @@ const AnalyticSection = () => {
           <p className='text-muted-foreground'> days ago</p>
         </CardContent>
       </Card>
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Card Title</CardTitle>
           <CardDescription>Card Description</CardDescription>
@@ -61,7 +61,7 @@ const AnalyticSection = () => {
         <CardFooter>
           <p>Card Footer</p>
         </CardFooter>
-      </Card>
+      </Card> */}
     </div>
   )
 }
