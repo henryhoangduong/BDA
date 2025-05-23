@@ -1,14 +1,4 @@
-import {
-  Home,
-  Terminal,
-  PlugZap,
-  Key,
-  Settings,
-  HelpCircle,
-  HardDrive,
-  ChartAreaIcon,
-  MessageCircle
-} from 'lucide-react'
+import { Table, Terminal, PlugZap, Key, Settings, MessageCircle } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -17,19 +7,23 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter
 } from '@/components/ui/sidebar'
+import logo from '@/assets/logo/logo.svg'
 const sidebarItems = [
   { title: 'Chat', icon: MessageCircle, url: '/' },
   { title: 'Documents', icon: Terminal, url: '/documents' },
-  { title: 'Plugins', icon: PlugZap, url: '/plugins' },
-  { title: 'API Keys', icon: Key, url: '/api-keys' },
-  { title: 'Settings', icon: Settings, url: '/settings' }
+  { title: 'Evaluation', icon: Table, url: '/evaluation' }
 ]
-
+const bottomItems = [{ title: 'Settings', icon: Settings, url: '/settings' }]
 const AppSidebar = () => {
   return (
     <Sidebar>
+      <SidebarHeader>
+        <img src={logo} alt='logo' className='w-7' />
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -49,6 +43,21 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarGroupLabel>Others</SidebarGroupLabel>
+        <SidebarMenu>
+          {bottomItems.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild>
+                <a href={item.url}>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }

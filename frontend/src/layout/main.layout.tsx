@@ -1,4 +1,5 @@
 import AppSidebar from '@/components/app-sidebar'
+import Header from '@/components/header'
 import { Outlet } from 'react-router-dom'
 export const MainLayout = () => {
   return (
@@ -6,7 +7,7 @@ export const MainLayout = () => {
       <div>
         <AppSidebar />
       </div>
-      <div className='w-full'>
+      <div className='flex-1  min-w-0 overflow-auto'>
         <Outlet />
       </div>
     </div>

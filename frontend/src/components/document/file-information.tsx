@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { useQuery } from '@tanstack/react-query'
 import { ingestionByIdQueryFn } from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import PDF from '../../assets/files/PDF.svg'
 
 import { ChunkViewer } from './chunk-viewer'
 import { Separator } from '@/components/ui/separator'
@@ -31,7 +32,7 @@ const FileInformation = ({ trigger, doc_id }: Props) => {
             <CardTitle className='text-lg'>Document Metadata</CardTitle>
           </CardHeader>
           <CardContent>
-            <dl className='grid grid-cols-2 gap-x-4 gap-y-2'>
+            <dl className='grid grid-cols-2 gap-x-4 gap-y-4'>
               <dt className='font-medium text-sm text-gray-700'>ID: </dt>
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.id}</dd>
 
@@ -39,7 +40,8 @@ const FileInformation = ({ trigger, doc_id }: Props) => {
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.filename}</dd>
 
               <dt className='font-medium text-sm text-gray-700'>Type: </dt>
-              <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.type}</dd>
+              {/* <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.type == '.pdf'}</dd> */}
+              <img src={PDF} alt='' className='w-6' />
 
               <dt className='font-medium text-sm text-gray-700'>Chunk: </dt>
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.chunk_number}</dd>

@@ -9,6 +9,7 @@ import { FileText } from 'lucide-react'
 import FileInformation from './file-information'
 import ParsingStatus from './parsing-status'
 import { toast } from '@/hooks/use-toast'
+import { Input } from '../ui/input'
 interface Props {
   uploadButton?: React.ReactNode
 }
@@ -46,8 +47,13 @@ const DocumentTable = ({ uploadButton }: Props) => {
     })
   }
   return (
-    <Card className='p-6'>
-      <CardHeader>{uploadButton}</CardHeader>
+    <Card className='p-4'>
+      <CardHeader className='p-4 flex flex-row items-center'>
+        <div className='w-[30%]'>
+          <Input type='text' className='pl-10 pr-20 sm:text-sm sm:leading-5' placeholder='Search documents...' />
+        </div>
+        {uploadButton}
+      </CardHeader>
       <Table>
         <TableCaption>A list of your documents</TableCaption>
         <TableHeader>
@@ -67,14 +73,12 @@ const DocumentTable = ({ uploadButton }: Props) => {
             const month = date.getMonth() + 1 // 5  (months are zero-indexed)
             const year = date.getFullYear()
             const raw = item.metadata.file_path
-            const fsPath = raw.replace(/^.*(\/Users\/.*)$/, '$1')
-            const fileUrl = `file://${raw}`
 
             return (
               <TableRow key={index}>
                 <FileInformation
                   trigger={
-                    <TableCell className='flex flex-row items-center gap-2 font-semibold text-left cursor-pointer hover:underline'>
+                    <TableCell className='flex flex-row items-center gap-2 font-medium text-left cursor-pointer hover:underline'>
                       <FileText />
                       {item.metadata.filename}
                     </TableCell>

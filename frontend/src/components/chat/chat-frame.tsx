@@ -134,11 +134,7 @@ const ChatFrame = ({ messages, setMessages }: ChatFrameProps) => {
               className='border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0'
             />
           </div>
-          <Button
-            type='submit'
-            disabled={isLoading || !inputMessage.trim()}
-            className='bg-[#0066b2] hover:bg-[#0077cc]'
-          >
+          <Button type='submit' disabled={isLoading || !inputMessage.trim()}>
             <Send className='h-4 w-4' />
           </Button>
         </form>
