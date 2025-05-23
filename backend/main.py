@@ -5,6 +5,7 @@ from api.ingestion_routes import ingestion
 from api.embedding_routes import embedding_route
 from api.chat_routes import chat
 from api.database_routes import database_route
+from api.dataset_routes import dataset_route
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from dotenv import load_dotenv
@@ -77,6 +78,7 @@ app.include_router(ingestion, tags=["Ingestion"], prefix="/api")
 app.include_router(embedding_route, tags=["Embedding"], prefix="/api")
 app.include_router(chat, tags=["Chat"], prefix="/api")
 app.include_router(database_route, tags=["Database"], prefix="/api")
+app.include_router(dataset_route, tags=["Dataset"], prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn
