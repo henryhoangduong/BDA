@@ -4,6 +4,7 @@ import DocumentPage from './pages/document.page'
 import ChatPage from './pages/chat.page'
 import EvaluationPage from './pages/evaluation.page'
 import SettingPage from './pages/setting.page'
+import DatasetPage from './pages/dataset.page'
 
 export const AppRoutes = () => {
   return (
@@ -13,7 +14,7 @@ export const AppRoutes = () => {
         <Route path='/documents' element={<DocumentPage />} />
         <Route path='/evaluation' element={<EvaluationPage />} />
         <Route path='/settings' element={<SettingPage />} />
-
+        <Route path='/dataset' element={<DatasetPage />} />
         <Route path='*' element={<div className='p-8 text-center'>Page Not Found</div>} />
       </Route>
     </Routes>

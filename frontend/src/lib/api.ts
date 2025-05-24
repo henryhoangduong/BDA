@@ -1,6 +1,7 @@
 import { SimbaDoc } from '@/types/document'
 import { API } from './axios-client'
 import { config } from '@/config/config'
+import { data } from 'react-router-dom'
 
 //***************************** INGESTION *****************************
 export const ingestionMutationFn = async (files: FormData[]) => {
@@ -120,4 +121,21 @@ export async function handleChatStream(
 export const embeddingDocumentByIdMutationFn = async (doc_id: string) => {
   const res = await API.post(`embed/document/${doc_id}`)
   return res.data
+}
+//***************************** PARSING *****************************
+export const parseDocMutationFn = async (doc_id: string, parser = 'docling') => {
+  const response = await API.post('parses', { data: doc_id, parser })
+  return response.data
+}
+export const getParsersQueryFn = async () => {
+  const response = await API.get('parsers')
+  return response.data
+}
+export const getParsingTasksQueryFn = async () => {
+  const response = await API.get('parsing/tasks')
+  return response.data
+}
+export const getParsingTaskStatusByIdQueryFn = async (task_id: string) => {
+  const response = await API.get(`parsing/tasks/${task_id}`)
+  return response.data
 }

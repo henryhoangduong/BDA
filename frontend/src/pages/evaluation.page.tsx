@@ -2,11 +2,7 @@ import React from 'react'
 import { ActiveTable } from 'active-table-react'
 
 const EvaluationPage = () => {
-  const data = [
-    ['Question', 'Generated Answer'],
-    ['Earth', 12756],
-    ['Mars', 6792]
-  ]
+  const data = [['Question', 'Generated Answer']]
   return (
     <div className=''>
       <header className='p-4 w-full shadow-sm mb-5'>
