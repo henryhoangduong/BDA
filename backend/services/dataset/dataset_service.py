@@ -3,6 +3,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from core.factories.llm_factory import get_llm
+from langchain.schema import Document
 import json
 import logging
 import re
@@ -12,7 +13,7 @@ llm = get_llm()
 
 
 async def generate_qa_from_chunks(
-    chunks: List[str],
+    chunks: List[Document],
 ) -> List[Dict[str, str]]:
     try:
         prompt = PromptTemplate(
@@ -31,7 +32,8 @@ async def generate_qa_from_chunks(
 
         qas: List[Dict[str, str]] = []
         for chunk in chunks:
-            result: dict = chain.invoke({"chunk": chunk})
+            print("chunk: ", chunk)
+            result: dict = chain.invoke({"chunk": chunk.page_content})
             raw_text: str = result.get("text", "")
 
             m = re.search(r"```json\n(.*)```", raw_text, flags=re.DOTALL)
@@ -44,7 +46,7 @@ async def generate_qa_from_chunks(
                     "Could not parse JSON from LLM output: %s\nError: %s", json_str, e)
                 continue
 
-            qas.append({"page_content": chunk, **qa})
+            qas.append({**(chunk.model_dump()), **qa})
 
         return qas
     except Exception as e:

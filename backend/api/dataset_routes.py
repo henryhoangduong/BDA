@@ -15,8 +15,7 @@ db = get_database()
 async def create_dataset(doc_id: str):
     try:
         document = db.get_document(doc_id)
-        chunks = [doc.page_content for doc in document.documents]
-        result = await generate_qa_from_chunks(chunks)
+        result = await generate_qa_from_chunks(document.documents)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

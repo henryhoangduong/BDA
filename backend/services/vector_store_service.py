@@ -25,10 +25,7 @@ class VectorStoreService:
         if hasattr(self, "store"):
             del self.store
 
-        if settings.vector_store.provider == "faiss":
-            self.store = self._initialize_faiss()
-        elif settings.vector_store.provider == "chroma":
-            self.store = self._initialize_chroma()
+        self.store = self._initialize_faiss()
 
     def as_retriever(self, **kwargs):
         return self.store.as_retriever(**kwargs)
@@ -163,5 +160,5 @@ class VectorStoreService:
 
             return True
         except Exception as e:
-            logger.error("Error deleting documents: ", e)
+            logger.error("Error deleting documents in vector store: ", e)
             raise e

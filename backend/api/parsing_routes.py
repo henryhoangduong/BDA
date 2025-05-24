@@ -85,3 +85,14 @@ async def get_all_tasks():
     except Exception as e:
         logger.error(f"Error fetching tasks: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@parsing.get("/parsing/tasks/{task_id}")
+async def get_task_status(task_id: str):
+    """Check status of a parsing task"""
+    result = celery.AsyncResult(task_id)
+    return {
+        "task_id": task_id,
+        "status": result.status,
+        "result": result.result if result.ready() else None,
+    }
