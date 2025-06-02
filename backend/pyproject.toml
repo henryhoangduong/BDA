@@ -27,9 +27,9 @@ dependencies = [
 
     # PDF / OCR / layout dependencies
     "pdfminer>=20191125",
-    "pdfminer-six>=20250506",
+    "pdfminer-six==20250327",
 
-    "pdfplumber>=0.6.0",            # ⬅️ add this to force a version that uses pycryptodome
+    "pdfplumber>=0.11.0,<0.12.0",            # ⬅️ add this to force a version that uses pycryptodome
     "layoutparser>=0.3.4",          # ⬅️ bump to a release that pulls in pdfplumber>=0.6.x
 
     "docling>=2.15.1",
