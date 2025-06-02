@@ -30,7 +30,7 @@ dependencies = [
     "pdfminer-six>=20250506",
 
     "pdfplumber>=0.6.0",            # ⬅️ add this to force a version that uses pycryptodome
-    "layoutparser>=0.3.6",          # ⬅️ bump to a release that pulls in pdfplumber>=0.6.x
+    "layoutparser>=0.3.4",          # ⬅️ bump to a release that pulls in pdfplumber>=0.6.x
 
     "docling>=2.15.1",
     "pytesseract>=0.3.13",
