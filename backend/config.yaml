@@ -1,19 +1,18 @@
 # config.yaml
 
 project:
-  name: "Simba"
+  name: "BDA"
   version: "1.0.0"
   api_version: "/api/v1"
 
 paths:
   base_dir: null  # Will be set programmatically
-  markdown_dir: "markdown"
   faiss_index_dir: "vector_stores/faiss_index"
   vector_store_dir: "vector_stores"
 
 llm:
-  provider: "openai"
-  model_name: "gpt-4o"
+  provider: "google"
+  model_name: "gemini-1.5-flash"
   temperature: 0.0
   max_tokens: null
   streaming: true
@@ -21,13 +20,14 @@ llm:
 
 embedding:
   provider: "huggingface"
-  model_name: "BAAI/bge-base-en-v1.5"
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
   device: "mps"  # Changed from mps to cpu for container compatibility
   additional_params: {}
 
 vector_store:
-  provider: "faiss"
-  collection_name: "migi_collection"
+  provider: "pgvector"
+  collection_name: "chunk_embeddings"
+
   additional_params: {}
 
 chunking:
@@ -35,11 +35,34 @@ chunking:
   chunk_overlap: 200
 
 retrieval:
+  method: "default" # Options: default, semantic, keyword, hybrid, ensemble, reranked
   k: 5
+  # Method-specific parameters
+  params:
+    # Semantic retrieval parameters
+    score_threshold: 0.5
+    
+    # Hybrid retrieval parameters
+    prioritize_semantic: true
+    
+    # Ensemble retrieval parameters
+    weights: [0.7, 0.3]  # Weights for semantic and keyword retrievers
+    
+    # Reranking parameters
+    reranker_model: colbert
+    reranker_threshold: 0.7
 
-features:
-  enable_parsers: true  # Set to false to disable parsing
+storage:
+  provider: supabase
+
+
+
+# Database configuration
+database:
+  provider: postgres # Options: litedb, sqlite
+  additional_params: {}
+
 
 celery: #REMOVE IF enable_parsers is false
-  broker_url: redis://localhost:6379/0
-  result_backend: redis://localhost:6379/1
+  broker_url: rediss://:AU5MAAIjcDFiYmQxNzhmMjIzMmE0ZGM3OTRkYjRiZTg4MTkxNDJiNXAxMA@selected-tick-20044.upstash.io:6379?ssl_cert_reqs=required
+  result_backend: rediss://:AU5MAAIjcDFiYmQxNzhmMjIzMmE0ZGM3OTRkYjRiZTg4MTkxNDJiNXAxMA@selected-tick-20044.upstash.io:6379?ssl_cert_reqs=required

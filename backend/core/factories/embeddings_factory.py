@@ -20,9 +20,7 @@ SUPPORTED_PROVIDERS = {
 
 
 @lru_cache()
-def get_embeddings(
-    provider: Optional[str] = None, model_name: Optional[str] = None, **kwargs
-) -> Embeddings:
+def get_embeddings(**kwargs) -> Embeddings:
     """
     Get an embedding model instance.
     Uses LRU cache to maintain single instance per configuration.
@@ -40,60 +38,43 @@ def get_embeddings(
         >>> embeddings = get_embeddings("huggingface", "sentence-transformers/all-mpnet-base-v2")
         >>> embeddings = get_embeddings("openai", dimensions=384)
     """
-
-    # TODO: integrate litellm
-
-    # Use settings if not explicitly provided
-    provider = provider or settings.embedding.provider
-    model_name = model_name or settings.embedding.model_name
-
-    if provider not in SUPPORTED_PROVIDERS:
+    if settings.embedding.provider not in SUPPORTED_PROVIDERS:
         raise ValueError(
-            f"Unsupported embedding provider: {provider}. "
+            f"Unsupported embedding provider: {settings.embedding.provider}. "
             f"Supported providers: {list(SUPPORTED_PROVIDERS.keys())}"
         )
+    # TODO: integrate litellm
+    device = settings.embedding.device
 
     try:
-        if provider == "openai":
+        if settings.embedding.provider == "openai":
             return OpenAIEmbeddings(
-                model=model_name, **settings.embedding.additional_params, **kwargs
+                model=settings.embedding.model_name,
+                **settings.embedding.additional_params,
+                **kwargs,
             )
-
-        elif provider == "huggingface":
+        elif settings.embedding.provider == "huggingface":
             return HuggingFaceEmbeddings(
-                model_name=model_name,
-                model_kwargs={"device": settings.embedding.device},
+                model_name=settings.embedding.model_name,
+                # Use the potentially overridden device
+                model_kwargs={"device": device},
                 **settings.embedding.additional_params,
                 **kwargs,
             )
 
-        elif provider == "ollama":
+        elif settings.embedding.provider == "ollama":
             return OllamaEmbeddings(
-                model_name=model_name or "nomic-embed-text",
+                model_name=settings.embedding.model_name or "nomic-embed-text",
                 **settings.embedding.additional_params,
                 **kwargs,
             )
 
-        elif provider == "cohere":
+        elif settings.embedding.provider == "cohere":
             return CohereEmbeddings(
-                model=model_name or "embed-english-v3.0",
+                model=settings.embedding.model_name or "embed-english-v3.0",
                 **settings.embedding.additional_params,
                 **kwargs,
             )
-
     except Exception as e:
         logger.error(f"Error creating embeddings for provider {provider}: {e}")
         raise
-
-
-def get_embeddings():
-    """Get embeddings model based on configuration"""
-    if settings.embedding.provider == "huggingface":
-        return HuggingFaceEmbeddings(
-            model_name=settings.embedding.model_name,
-            model_kwargs={"device": settings.embedding.device},
-        )
-    else:
-        raise ValueError(
-            f"Unsupported embedding provider: {settings.embedding.provider}"
-        )

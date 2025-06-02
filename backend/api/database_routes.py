@@ -4,8 +4,7 @@ from fastapi import APIRouter
 
 from core.factories.database_factory import get_database
 from models.simbadoc import SimbaDoc
-from services.ingestion_service.document_ingestion_service import \
-    DocumentIngestionService
+from services.ingestion.document_ingestion import DocumentIngestionService
 
 database_route = APIRouter()
 

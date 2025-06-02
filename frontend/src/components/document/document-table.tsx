@@ -72,8 +72,6 @@ const DocumentTable = ({ uploadButton }: Props) => {
             const day = date.getDate() // 22
             const month = date.getMonth() + 1 // 5  (months are zero-indexed)
             const year = date.getFullYear()
-            const raw = item.metadata.file_path
-
             return (
               <TableRow key={index}>
                 <FileInformation

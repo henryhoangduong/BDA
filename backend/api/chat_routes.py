@@ -1,4 +1,5 @@
 import json
+import logging
 
 from fastapi import APIRouter, Body
 from fastapi.responses import StreamingResponse
@@ -7,7 +8,7 @@ from pydantic import BaseModel
 
 from services.chatbots.chat4u.graph import graph
 from services.chatbots.chat4u.state import State, for_client
-import logging
+
 logger = logging.getLogger(__name__)
 chat = APIRouter()
 

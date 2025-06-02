@@ -1,12 +1,15 @@
-from typing import List, Dict
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from core.factories.llm_factory import get_llm
-from langchain.schema import Document
 import json
 import logging
 import re
+from typing import Dict, List
+
+from langchain.chains import LLMChain
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain.schema import Document
+
+from core.factories.llm_factory import get_llm
+
 logger = logging.getLogger(__name__)
 
 llm = get_llm()

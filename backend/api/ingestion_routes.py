@@ -9,13 +9,14 @@ from core.config import settings
 from core.factories.database_factory import get_database
 from core.factories.vector_store_factory import VectorStoreFactory
 from models.simbadoc import SimbaDoc
-from services.ingestion_service.document_ingestion_service import \
-    DocumentIngestionService
-from services.ingestion_service.file_handling import save_file_locally
+from services.ingestion.document_ingestion import DocumentIngestionService
+from services.ingestion.file_handling import save_file_locally
+from services.ingestion.loader import Loader
 
 ingestion_service = DocumentIngestionService()
 store = VectorStoreFactory.get_vector_store()
 logger = logging.getLogger(__name__)
+loader = Loader()
 
 ingestion = APIRouter()
 db = get_database()
@@ -28,22 +29,17 @@ async def ingest_document(
         default="/", description="Folder path to store the document"
     ),
 ):
+    """Ingest a document into the vector store"""
     try:
-        store_path = Path(settings.paths.upload_dir)
-        if folder_path != "/":
-            store_path = store_path / folder_path.strip("/")
-
+        # Process files concurrently using asyncio.gather
         async def process_file(file):
-            await file.seek(0)
-            await save_file_locally(file, store_path)
-            await file.seek(0)
-            simba_doc = await ingestion_service.ingest_document(file)
+            simba_doc = await ingestion_service.ingest_document(file, folder_path)
             return simba_doc
 
         # Process all files concurrently
         response = await asyncio.gather(*[process_file(file) for file in files])
-        # # Insert into database
-        db.insert_documents(response)
+        db.insert_documents(response, user_id="1")
+
         return response
 
     except Exception as e:
@@ -53,7 +49,7 @@ async def ingest_document(
 
 @ingestion.get("/ingestion")
 async def get_ingestion_documents():
-    documents = db.get_all_documents()
+    documents = db.get_all_documents(user_id="1")
     return documents
 
 
@@ -101,3 +97,17 @@ async def delete(uids: List[str]):
     except Exception as e:
         logger.error(f"Error in delete_document: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@ingestion.get("/loaders")
+async def get_loaders():
+    """Get supported document loaders"""
+    return {
+        "loaders": [loader_name.__name__ for loader_name in loader.SUPPORTED_EXTENSIONS.values()]
+    }
+
+
+@ingestion.get("/upload-directory")
+async def get_upload_directory():
+    """Get upload directory path"""
+    return {"path": str(settings.paths.upload_dir)}
