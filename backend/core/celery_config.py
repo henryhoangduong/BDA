@@ -1,11 +1,13 @@
 import logging
+import os
 
 import torch
 from celery import Celery
 from celery.signals import worker_init, worker_shutdown, worker_shutting_down
 from dotenv import load_dotenv
+
 from core.config import settings
-import os
+
 load_dotenv()
 logger = logging.getLogger(__name__)
 

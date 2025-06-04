@@ -23,7 +23,7 @@ class MinIOStorageProvider(StorageProvider):
             settings.storage.minio_endpoint,
             access_key=settings.storage.minio_access_key,
             secret_key=settings.storage.minio_secret_key,
-            secure=settings.storage.minio_secure
+            secure=settings.storage.minio_secure,
         )
         self.bucket = settings.storage.minio_bucket
 
@@ -61,7 +61,7 @@ class MinIOStorageProvider(StorageProvider):
                 object_name=object_name,
                 data=open(local_file_path, "rb"),
                 length=local_file_path.stat().st_size,
-                content_type=file.content_type
+                content_type=file.content_type,
             )
 
             # Reset file pointer for subsequent reads
@@ -89,13 +89,12 @@ class MinIOStorageProvider(StorageProvider):
             # If not, get from MinIO
             object_name = str(file_path).replace("\\", "/")
             response = self.client.get_object(
-                bucket_name=self.bucket,
-                object_name=object_name
+                bucket_name=self.bucket, object_name=object_name
             )
             return response.read()
 
         except S3Error as e:
-            if e.code == 'NoSuchKey':
+            if e.code == "NoSuchKey":
                 return None
             logger.error(f"Error retrieving file from MinIO: {str(e)}")
             raise
@@ -105,10 +104,7 @@ class MinIOStorageProvider(StorageProvider):
         try:
             # Delete from MinIO
             object_name = str(file_path).replace("\\", "/")
-            self.client.remove_object(
-                bucket_name=self.bucket,
-                object_name=object_name
-            )
+            self.client.remove_object(bucket_name=self.bucket, object_name=object_name)
 
             # Delete local copy if exists
             if str(file_path) in self.path_mapping:
@@ -120,7 +116,7 @@ class MinIOStorageProvider(StorageProvider):
             return True
 
         except S3Error as e:
-            if e.code == 'NoSuchKey':
+            if e.code == "NoSuchKey":
                 return False
             logger.error(f"Error deleting file from MinIO: {str(e)}")
             return False
@@ -136,14 +132,11 @@ class MinIOStorageProvider(StorageProvider):
 
             # Check MinIO
             object_name = str(file_path).replace("\\", "/")
-            self.client.stat_object(
-                bucket_name=self.bucket,
-                object_name=object_name
-            )
+            self.client.stat_object(bucket_name=self.bucket, object_name=object_name)
             return True
 
         except S3Error as e:
-            if e.code == 'NoSuchKey':
+            if e.code == "NoSuchKey":
                 return False
             logger.error(f"Error checking file existence in MinIO: {str(e)}")
             return False

@@ -34,6 +34,7 @@ class DateTimeEncoder(json.JSONEncoder):
 
 class SQLDocument(Base):
     """SQLAlchemy model for documents table"""
+
     __tablename__ = "documents"
 
     id = Column(String, primary_key=True)
@@ -42,7 +43,8 @@ class SQLDocument(Base):
 
     # Add relationship to chunks
     chunks = relationship(
-        "ChunkEmbedding", back_populates="document", cascade="all, delete-orphan")
+        "ChunkEmbedding", back_populates="document", cascade="all, delete-orphan"
+    )
 
     @classmethod
     def from_simbadoc(cls, doc: SimbaDoc, user_id: str) -> "SQLDocument":
@@ -50,7 +52,7 @@ class SQLDocument(Base):
         return cls(
             id=doc.id,
             user_id=user_id,
-            data=json.loads(json.dumps(doc.dict(), cls=DateTimeEncoder))
+            data=json.loads(json.dumps(doc.dict(), cls=DateTimeEncoder)),
         )
 
     def to_simbadoc(self) -> SimbaDoc:
@@ -85,14 +87,14 @@ class PostgresDB(DatabaseService):
                     host=settings.postgres.host,
                     port=settings.postgres.port,
                     dbname=settings.postgres.db,
-                    sslmode='disable'
+                    sslmode="disable",
                 )
                 logger.info("Created PostgreSQL connection pool")
             except Exception as e:
                 logger.error(f"Failed to create connection pool: {str(e)}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Failed to connect to database"
+                    detail="Failed to connect to database",
                 )
         return cls._pool
 
@@ -105,7 +107,7 @@ class PostgresDB(DatabaseService):
                 password=settings.postgres.password,
                 host=settings.postgres.host,
                 port=settings.postgres.port,
-                database=settings.postgres.db
+                database=settings.postgres.db,
             )
             # Use NullPool since we're managing our own connection pool
             self._engine = create_engine(url, poolclass=NullPool)
@@ -130,7 +132,7 @@ class PostgresDB(DatabaseService):
             logger.error(f"Database connection error: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database connection failed"
+                detail="Database connection failed",
             )
         finally:
             if conn:
@@ -148,7 +150,8 @@ class PostgresDB(DatabaseService):
                     cursor.execute(query, params or ())
                     rowcount = cursor.rowcount
                     logger.info(
-                        f"Query executed successfully. Affected rows: {rowcount}")
+                        f"Query executed successfully. Affected rows: {rowcount}"
+                    )
                 conn.commit()
                 logger.info("Transaction committed")
                 return rowcount
@@ -157,7 +160,7 @@ class PostgresDB(DatabaseService):
                 logger.error(f"Query execution error: {str(e)}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Database query failed: {str(e)}"
+                    detail=f"Database query failed: {str(e)}",
                 )
 
     @classmethod
@@ -176,7 +179,7 @@ class PostgresDB(DatabaseService):
                 logger.error(f"fetch_all error: {str(e)}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Database fetch failed: {str(e)}"
+                    detail=f"Database fetch failed: {str(e)}",
                 )
 
     @classmethod
@@ -190,8 +193,7 @@ class PostgresDB(DatabaseService):
                     cursor.execute(query, params or ())
                     row = cursor.fetchone()
                     if row:
-                        logger.info(
-                            f"Query returned a row with id: {row.get('id')}")
+                        logger.info(f"Query returned a row with id: {row.get('id')}")
                         return dict(row)
                     else:
                         logger.warning("Query returned no results")
@@ -200,7 +202,7 @@ class PostgresDB(DatabaseService):
                 logger.error(f"fetch_one error: {str(e)}", exc_info=True)
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Database fetch failed: {str(e)}"
+                    detail=f"Database fetch failed: {str(e)}",
                 )
 
     # ORM methods implementing DatabaseService interface
@@ -219,15 +221,16 @@ class PostgresDB(DatabaseService):
         finally:
             session.close()
 
-    def insert_documents(self, documents: SimbaDoc | List[SimbaDoc], user_id: str) -> List[str]:
+    def insert_documents(
+        self, documents: SimbaDoc | List[SimbaDoc], user_id: str
+    ) -> List[str]:
         """Insert one or multiple documents using SQLAlchemy ORM."""
         if not isinstance(documents, list):
             documents = [documents]
 
         try:
             session = self._Session()
-            db_docs = [SQLDocument.from_simbadoc(
-                doc, user_id) for doc in documents]
+            db_docs = [SQLDocument.from_simbadoc(doc, user_id) for doc in documents]
             session.add_all(db_docs)
             session.commit()
             return [doc.id for doc in documents]
@@ -238,7 +241,9 @@ class PostgresDB(DatabaseService):
         finally:
             session.close()
 
-    def get_document(self, document_id: str | List[str], user_id: str = None) -> Optional[SimbaDoc] | List[Optional[SimbaDoc]]:
+    def get_document(
+        self, document_id: str | List[str], user_id: str = None
+    ) -> Optional[SimbaDoc] | List[Optional[SimbaDoc]]:
         """Retrieve a document by ID or a list of documents by IDs using SQLAlchemy ORM.
         If a list of IDs is provided, returns a list of SimbaDoc (None for not found).
         If a single ID is provided, returns a single SimbaDoc or None.
@@ -247,17 +252,20 @@ class PostgresDB(DatabaseService):
             session = self._Session()
             if isinstance(document_id, list):
                 query = session.query(SQLDocument).filter(
-                    SQLDocument.id.in_(document_id))
+                    SQLDocument.id.in_(document_id)
+                )
                 if user_id:
                     query = query.filter(SQLDocument.user_id == user_id)
                 docs = query.all()
                 # Map id to doc for fast lookup
                 doc_map = {doc.id: doc for doc in docs}
                 # Return in the same order as input list, None if not found
-                return [doc_map.get(doc_id).to_simbadoc() if doc_map.get(doc_id) else None for doc_id in document_id]
+                return [
+                    doc_map.get(doc_id).to_simbadoc() if doc_map.get(doc_id) else None
+                    for doc_id in document_id
+                ]
             else:
-                query = session.query(SQLDocument).filter(
-                    SQLDocument.id == document_id)
+                query = session.query(SQLDocument).filter(SQLDocument.id == document_id)
                 if user_id:
                     query = query.filter(SQLDocument.user_id == user_id)
                 doc = query.first()
@@ -288,17 +296,19 @@ class PostgresDB(DatabaseService):
         finally:
             session.close()
 
-    def update_document(self, document_id: str, document: SimbaDoc, user_id: str = None) -> bool:
+    def update_document(
+        self, document_id: str, document: SimbaDoc, user_id: str = None
+    ) -> bool:
         """Update a document using SQLAlchemy ORM with proper datetime handling."""
         try:
             session = self._Session()
             # Convert to dict with datetime handling
-            doc_dict = json.loads(json.dumps(
-                document.model_dump(), cls=DateTimeEncoder))
+            doc_dict = json.loads(
+                json.dumps(document.model_dump(), cls=DateTimeEncoder)
+            )
 
             # Build query
-            query = session.query(SQLDocument).filter(
-                SQLDocument.id == document_id)
+            query = session.query(SQLDocument).filter(SQLDocument.id == document_id)
 
             # Filter by user_id if provided
             if user_id:
@@ -320,8 +330,7 @@ class PostgresDB(DatabaseService):
             session = self._Session()
 
             # Build query
-            query = session.query(SQLDocument).filter(
-                SQLDocument.id == document_id)
+            query = session.query(SQLDocument).filter(SQLDocument.id == document_id)
 
             # Filter by user_id if provided
             if user_id:
@@ -341,8 +350,11 @@ class PostgresDB(DatabaseService):
         """Delete multiple documents using SQLAlchemy ORM."""
         try:
             session = self._Session()
-            result = session.query(SQLDocument).filter(
-                SQLDocument.id.in_(document_ids)).delete(synchronize_session=False)
+            result = (
+                session.query(SQLDocument)
+                .filter(SQLDocument.id.in_(document_ids))
+                .delete(synchronize_session=False)
+            )
             session.commit()
             return result > 0
         except Exception as e:
@@ -389,26 +401,24 @@ class PostgresDB(DatabaseService):
             query = session.query(SQLDocument)
 
             for key, value in filters.items():
-                if key == 'id':
+                if key == "id":
                     query = query.filter(SQLDocument.id == value)
-                elif key == 'user_id':
+                elif key == "user_id":
                     query = query.filter(SQLDocument.user_id == value)
                 else:
                     # Handle nested JSON filters using PostgreSQL JSON operators
-                    path_parts = key.split('.')
+                    path_parts = key.split(".")
                     # Build the JSON path operator
-                    json_path_str = '->'.join(
-                        [f"'{part}'" for part in path_parts[:-1]])
+                    json_path_str = "->".join([f"'{part}'" for part in path_parts[:-1]])
                     if json_path_str:
-                        json_path_str += '->>'
+                        json_path_str += "->>"
                     else:
-                        json_path_str = '->>'
+                        json_path_str = "->>"
                     json_path_str += f"'{path_parts[-1]}'"
 
                     # Apply the filter using raw SQL for JSON operators
                     query = query.filter(
-                        f"data {json_path_str} = :value",
-                        value=str(value)
+                        f"data {json_path_str} = :value", value=str(value)
                     )
 
             results = query.all()
@@ -442,8 +452,19 @@ class PostgresDB(DatabaseService):
 
 if __name__ == "__main__":
     from langchain.schema import Document as LangchainDocument
+
     db = PostgresDB()
-    db.insert_documents(SimbaDoc(id="1", documents=[LangchainDocument(page_content="Hello, world!", metadata={
-                        "source": "test"})], metadata=MetadataType(filename="test")), "user-uuid")
+    db.insert_documents(
+        SimbaDoc(
+            id="1",
+            documents=[
+                LangchainDocument(
+                    page_content="Hello, world!", metadata={"source": "test"}
+                )
+            ],
+            metadata=MetadataType(filename="test"),
+        ),
+        "user-uuid",
+    )
     # print(db.delete_documents(["1"]))
     db.close_pool()

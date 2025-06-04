@@ -2,10 +2,10 @@ import logging
 import os
 from typing import Optional
 
-from supabase import Client, create_client
 from supabase.client import ClientOptions
 
 from core.config import settings
+from supabase import Client, create_client
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +28,9 @@ class SupabaseClientSingleton:
         if cls._instance is None:
             # Get credentials from environment variables directly, which is the recommended approach
             supabase_url = os.environ.get("SUPABASE_URL")
-            supabase_key = os.environ.get(
-                "SUPABASE_KEY") or os.environ.get("SUPABASE_PUBLIC_KEY")
+            supabase_key = os.environ.get("SUPABASE_KEY") or os.environ.get(
+                "SUPABASE_PUBLIC_KEY"
+            )
 
             # Fall back to settings if env vars are not available
             if not supabase_url:
@@ -57,7 +58,7 @@ class SupabaseClientSingleton:
                     options=ClientOptions(
                         postgrest_client_timeout=10,
                         storage_client_timeout=10,
-                    )
+                    ),
                 )
                 logger.info("✅ Supabase client initialized successfully")
             except Exception as e:
@@ -70,6 +71,7 @@ class SupabaseClientSingleton:
     def reset_instance(cls) -> None:
         """Reset the Supabase client instance (useful for testing)."""
         cls._instance = None
+
 
 # Export a function to get the singleton instance for easy import
 

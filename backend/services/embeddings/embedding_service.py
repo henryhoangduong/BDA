@@ -5,8 +5,8 @@ from langchain.schema import Document
 
 from core.factories.database_factory import get_database
 from core.factories.vector_store_factory import VectorStoreFactory
-from services.embeddings.utils import _clean_documents
 from models.simbadoc import SimbaDoc
+from services.embeddings.utils import _clean_documents
 from services.splitting.splitter import Splitter
 
 logger = logging.getLogger(__name__)
@@ -70,8 +70,7 @@ class EmbeddingService:
 
             langchain_documents = simbadoc.documents
 
-            langchain_documents = self.splitter.split_document(
-                langchain_documents)
+            langchain_documents = self.splitter.split_document(langchain_documents)
 
             # Clean documents
             langchain_documents = _clean_documents(langchain_documents)
@@ -79,7 +78,8 @@ class EmbeddingService:
             try:
                 # Add documents to vector store
                 self.vector_store.add_documents(
-                    document_id=doc_id, documents=langchain_documents)
+                    document_id=doc_id, documents=langchain_documents
+                )
 
                 # Update document status
                 simbadoc.metadata.enabled = True

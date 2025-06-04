@@ -2,9 +2,9 @@ from functools import lru_cache
 from typing import Optional
 
 from langchain_community.llms import VLLM
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 from core.config import LLMConfig, settings
 

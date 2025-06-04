@@ -1,23 +1,26 @@
 import json
 import logging
 import uuid
+from collections import defaultdict
 from datetime import datetime
 from typing import Any, List, Optional
-from models.simbadoc import SimbaDoc
+
+import numpy as np
 from langchain.schema.embeddings import Embeddings
 from langchain.vectorstores import VectorStore
+from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 from pgvector.sqlalchemy import Vector
 from psycopg2.extras import RealDictCursor
 from sqlalchemy import Column, DateTime, ForeignKey, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
-from langchain_community.retrievers import BM25Retriever
-import numpy as np
+
 from core.factories.embeddings_factory import get_embeddings
 from database.postgres import Base, DateTimeEncoder, PostgresDB, SQLDocument
+from models.simbadoc import SimbaDoc
 from services.auth.supabase_client import get_supabase_client
-from collections import defaultdict
+
 supabase = get_supabase_client()
 
 logger = logging.getLogger(__name__)
@@ -25,51 +28,52 @@ logger = logging.getLogger(__name__)
 
 class ChunkEmbedding(Base):
     """SQLAlchemy model for chunks_embeddings table"""
-    __tablename__ = 'chunks_embeddings'
+
+    __tablename__ = "chunks_embeddings"
 
     # Since LangChain Document uses string UUID, we'll use String type
     id = Column(String, primary_key=True, index=True)
-    document_id = Column(String, ForeignKey(
-        'documents.id', ondelete='CASCADE'), nullable=False)
+    document_id = Column(
+        String, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False
+    )
     user_id = Column(String, nullable=False)
     data = Column(JSONB, nullable=False, default={})
     embedding = Column(Vector(384))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True),
-                        server_default=func.now(), onupdate=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
 
     # Define indexes using proper SQLAlchemy syntax
     __table_args__ = (
         # Index for faster user_id filtering
         # We'll create indexes separately in the ensure_text_search_index method
-        {'schema': None}
+        {"schema": None}
     )
 
     # Relationship to parent document
     document = relationship("SQLDocument", back_populates="chunks")
 
     @classmethod
-    def from_langchain_doc(cls, doc: Document, document_id: str, user_id: str, embedding: List[float]) -> "ChunkEmbedding":
+    def from_langchain_doc(
+        cls, doc: Document, document_id: str, user_id: str, embedding: List[float]
+    ) -> "ChunkEmbedding":
         """Create ChunkEmbedding from LangChain Document"""
         # Convert Document to dict format
-        doc_dict = {
-            "page_content": doc.page_content,
-            "metadata": doc.metadata
-        }
+        doc_dict = {"page_content": doc.page_content, "metadata": doc.metadata}
 
         return cls(
             id=doc.id,  # Use the LangChain document's ID directly as string
             document_id=document_id,
             user_id=user_id,
             data=json.loads(json.dumps(doc_dict, cls=DateTimeEncoder)),
-            embedding=embedding
+            embedding=embedding,
         )
 
     def to_langchain_doc(self) -> Document:
         """Convert to LangChain Document"""
         return Document(
-            page_content=self.data["page_content"],
-            metadata=self.data["metadata"]
+            page_content=self.data["page_content"], metadata=self.data["metadata"]
         )
 
 
@@ -112,8 +116,9 @@ class PGVectorStore(VectorStore):
         session = None
         try:
             session = self._Session()
-            doc = session.query(SQLDocument).filter(
-                SQLDocument.id == document_id).first()
+            doc = (
+                session.query(SQLDocument).filter(SQLDocument.id == document_id).first()
+            )
             return doc.to_simbadoc() if doc else None
         finally:
             if session:
@@ -135,8 +140,9 @@ class PGVectorStore(VectorStore):
             session = self._Session()
 
             # Check if document exists
-            existing_doc = session.query(SQLDocument).filter(
-                SQLDocument.id == document_id).first()
+            existing_doc = (
+                session.query(SQLDocument).filter(SQLDocument.id == document_id).first()
+            )
             if not existing_doc:
                 raise ValueError(f"Parent document {document_id} not found")
 
@@ -154,11 +160,8 @@ class PGVectorStore(VectorStore):
                     id=doc.id,  # Use the LangChain document's ID directly
                     document_id=document_id,
                     user_id=user_id,
-                    data={
-                        "page_content": doc.page_content,
-                        "metadata": doc.metadata
-                    },
-                    embedding=embedding
+                    data={"page_content": doc.page_content, "metadata": doc.metadata},
+                    embedding=embedding,
                 )
                 chunk_objects.append(chunk)
 
@@ -167,7 +170,8 @@ class PGVectorStore(VectorStore):
             session.commit()
 
             logger.info(
-                f"Successfully added {len(documents)} chunks for document {document_id}")
+                f"Successfully added {len(documents)} chunks for document {document_id}"
+            )
             return True
 
         except Exception as e:
@@ -185,7 +189,8 @@ class PGVectorStore(VectorStore):
         try:
             session = self._Session()
             query = session.query(ChunkEmbedding).filter(
-                ChunkEmbedding.user_id == user_id)
+                ChunkEmbedding.user_id == user_id
+            )
 
             chunks = query.all()
             # Modify this to ensure document_id is in metadata
@@ -194,8 +199,8 @@ class PGVectorStore(VectorStore):
                     page_content=chunk.data["page_content"],
                     metadata={
                         **chunk.data.get("metadata", {}),
-                        "document_id": chunk.document_id  # Explicitly add document_id
-                    }
+                        "document_id": chunk.document_id,  # Explicitly add document_id
+                    },
                 )
                 for chunk in chunks
             ]
@@ -224,13 +229,19 @@ class PGVectorStore(VectorStore):
 
         # Extract document IDs from first pass results
         first_pass_doc_ids = list(
-            {doc.metadata['document_id'] for doc in first_pass_docs})
+            {doc.metadata["document_id"] for doc in first_pass_docs}
+        )
 
         return first_pass_doc_ids
 
-    def _retrieve_with_text_search(self, query: str, user_id: str, top_k: int,
-                                   document_ids: Optional[List[str]] = None,
-                                   language: str = 'french') -> List[Document]:
+    def _retrieve_with_text_search(
+        self,
+        query: str,
+        user_id: str,
+        top_k: int,
+        document_ids: Optional[List[str]] = None,
+        language: str = "french",
+    ) -> List[Document]:
         """
         Perform text-based search using PostgreSQL's full-text search.
 
@@ -279,12 +290,12 @@ class PGVectorStore(VectorStore):
             for row in rows:
                 # Create a document with the data from the row
                 doc = Document(
-                    page_content=row['data'].get('page_content', ''),
+                    page_content=row["data"].get("page_content", ""),
                     metadata={
-                        **row['data'].get('metadata', {}),
-                        'id': row['id'],
-                        'document_id': row['document_id']
-                    }
+                        **row["data"].get("metadata", {}),
+                        "id": row["id"],
+                        "document_id": row["document_id"],
+                    },
                 )
                 results.append(doc)
 
@@ -294,9 +305,14 @@ class PGVectorStore(VectorStore):
             if session:
                 session.close()
 
-    def _retrieve_with_text_search(self, query: str, user_id: str, top_k: int,
-                                   document_ids: Optional[List[str]] = None,
-                                   language: str = 'french') -> List[Document]:
+    def _retrieve_with_text_search(
+        self,
+        query: str,
+        user_id: str,
+        top_k: int,
+        document_ids: Optional[List[str]] = None,
+        language: str = "french",
+    ) -> List[Document]:
         """
         Perform text-based search using PostgreSQL's full-text search.
 
@@ -345,12 +361,12 @@ class PGVectorStore(VectorStore):
             for row in rows:
                 # Create a document with the data from the row
                 doc = Document(
-                    page_content=row['data'].get('page_content', ''),
+                    page_content=row["data"].get("page_content", ""),
                     metadata={
-                        **row['data'].get('metadata', {}),
-                        'id': row['id'],
-                        'document_id': row['document_id']
-                    }
+                        **row["data"].get("metadata", {}),
+                        "id": row["id"],
+                        "document_id": row["document_id"],
+                    },
                 )
                 results.append(doc)
 
@@ -360,7 +376,9 @@ class PGVectorStore(VectorStore):
             if session:
                 session.close()
 
-    def _fuse_results_rrf(self, *ranked_lists: List[Document], k: int = 60, top_k: int = 100) -> List[Document]:
+    def _fuse_results_rrf(
+        self, *ranked_lists: List[Document], k: int = 60, top_k: int = 100
+    ) -> List[Document]:
         """
         Fuse multiple result lists using Reciprocal Rank Fusion.
 
@@ -379,7 +397,7 @@ class PGVectorStore(VectorStore):
         scores = defaultdict(float)
         for lst in ranked_lists:
             for rank, doc in enumerate(lst, start=1):
-                doc_id = doc.metadata.get('id')
+                doc_id = doc.metadata.get("id")
                 if doc_id is None:
                     continue
 
@@ -390,14 +408,20 @@ class PGVectorStore(VectorStore):
                 scores[doc_id] += 1 / (k + rank)
 
         # Sort by score and get top_k document IDs
-        top_ids = [d for d, _ in sorted(
-            scores.items(), key=lambda x: x[1], reverse=True)][:top_k]
+        top_ids = [
+            d for d, _ in sorted(scores.items(), key=lambda x: x[1], reverse=True)
+        ][:top_k]
 
         # Return documents in the new fused order
         return [doc_map[doc_id] for doc_id in top_ids if doc_id in doc_map]
 
-    def _retrieve_with_dense_vector(self, query: str, user_id: str, top_k: int,
-                                    document_ids: Optional[List[str]] = None) -> List[Document]:
+    def _retrieve_with_dense_vector(
+        self,
+        query: str,
+        user_id: str,
+        top_k: int,
+        document_ids: Optional[List[str]] = None,
+    ) -> List[Document]:
         """
         Perform pure vector similarity search.
 
@@ -450,12 +474,12 @@ class PGVectorStore(VectorStore):
             for row in rows:
                 # Create a document with the data from the row
                 doc = Document(
-                    page_content=row['data'].get('page_content', ''),
+                    page_content=row["data"].get("page_content", ""),
                     metadata={
-                        **row['data'].get('metadata', {}),
-                        'id': row['id'],
-                        'document_id': row['document_id']
-                    }
+                        **row["data"].get("metadata", {}),
+                        "id": row["id"],
+                        "document_id": row["document_id"],
+                    },
                 )
                 results.append(doc)
 
@@ -473,8 +497,7 @@ class PGVectorStore(VectorStore):
         if self._bm25_retriever is None or self._bm25_docs is None:
             # Get all documents for this user
             self._bm25_docs = self.get_all_documents(user_id=user_id)
-            logger.debug(
-                f"Initialized BM25 with {len(self._bm25_docs)} documents")
+            logger.debug(f"Initialized BM25 with {len(self._bm25_docs)} documents")
 
             # Initialize BM25 retriever
             self._bm25_retriever = BM25Retriever.from_documents(
@@ -483,15 +506,21 @@ class PGVectorStore(VectorStore):
                 bm25_params={
                     "k1": 1.2,
                     "b": 0.75,
-                }
+                },
             )
 
         return self._bm25_retriever
 
-    def similarity_search(self, query: str, user_id: str = "1", top_k: int = 200,
-                          bm25_k: int = 100, dense_k: int = 100,
-                          use_bm25_first_pass: bool = True,
-                          language: str = 'french') -> List[Document]:
+    def similarity_search(
+        self,
+        query: str,
+        user_id: str = "1",
+        top_k: int = 200,
+        bm25_k: int = 100,
+        dense_k: int = 100,
+        use_bm25_first_pass: bool = True,
+        language: str = "french",
+    ) -> List[Document]:
         """
         Search for documents similar to a query, filtered by user_id.
         Uses a fusion of BM25 and dense retrieval results.
@@ -519,7 +548,7 @@ class PGVectorStore(VectorStore):
                 user_id=user_id,
                 top_k=bm25_k,
                 document_ids=bm25_doc_ids,
-                language=language
+                language=language,
             )
 
         # Step 2: Dense vector retrieval
@@ -527,16 +556,13 @@ class PGVectorStore(VectorStore):
             query=query,
             user_id=user_id,
             top_k=dense_k,
-            document_ids=None  # Don't filter by BM25 results for pure dense retrieval
+            document_ids=None,  # Don't filter by BM25 results for pure dense retrieval
         )
 
         # Step 3: Fuse results using RRF
         if use_bm25_first_pass and sparse_results:
             fused_results = self._fuse_results_rrf(
-                sparse_results,
-                dense_results,
-                k=60,
-                top_k=top_k
+                sparse_results, dense_results, k=60, top_k=top_k
             )
         else:
             # If no BM25, just use dense results
@@ -570,13 +596,14 @@ class PGVectorStore(VectorStore):
             session = self._Session()
 
             # Get document_id from kwargs
-            document_id = kwargs.get('document_id')
+            document_id = kwargs.get("document_id")
             if not document_id:
                 raise ValueError("document_id is required in kwargs")
 
             # Check if document exists
-            existing_doc = session.query(SQLDocument).filter(
-                SQLDocument.id == document_id).first()
+            existing_doc = (
+                session.query(SQLDocument).filter(SQLDocument.id == document_id).first()
+            )
             if not existing_doc:
                 raise ValueError(f"Parent document {document_id} not found")
 
@@ -599,16 +626,15 @@ class PGVectorStore(VectorStore):
 
             # Create chunk objects
             chunk_objects = []
-            for text, metadata, embedding_vector, chunk_id in zip(texts, metadatas, embeddings, ids):
+            for text, metadata, embedding_vector, chunk_id in zip(
+                texts, metadatas, embeddings, ids
+            ):
                 chunk = ChunkEmbedding(
                     id=chunk_id,
                     document_id=document_id,
                     user_id=user_id,
-                    data={
-                        "page_content": text,
-                        "metadata": metadata
-                    },
-                    embedding=embedding_vector
+                    data={"page_content": text, "metadata": metadata},
+                    embedding=embedding_vector,
                 )
                 chunk_objects.append(chunk)
 
@@ -617,7 +643,8 @@ class PGVectorStore(VectorStore):
             session.commit()
 
             logger.info(
-                f"Successfully added {len(texts)} texts for document {document_id}")
+                f"Successfully added {len(texts)} texts for document {document_id}"
+            )
             return ids
 
         except Exception as e:

@@ -27,7 +27,8 @@ class VectorStoreFactory:
             self._vector_store = self._initialize_pgvector(embeddings)
         else:
             raise ValueError(
-                f"Unsupported vector store provider: {settings.vector_store.provider}")
+                f"Unsupported vector store provider: {settings.vector_store.provider}"
+            )
 
     def _initialize_pgvector(self, embeddings):
         return PGVectorStore()

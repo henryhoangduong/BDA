@@ -7,6 +7,7 @@ from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 
 from core.config import settings
 from core.factories.database_factory import get_database
+from core.factories.storage_factory import StorageFactory
 from core.factories.vector_store_factory import VectorStoreFactory
 from models.simbadoc import SimbaDoc
 from services.ingestion.document_ingestion import DocumentIngestionService
@@ -17,7 +18,7 @@ ingestion_service = DocumentIngestionService()
 store = VectorStoreFactory.get_vector_store()
 logger = logging.getLogger(__name__)
 loader = Loader()
-
+storage = StorageFactory.get_storage_provider()
 ingestion = APIRouter()
 db = get_database()
 
@@ -57,8 +58,7 @@ async def get_ingestion_documents():
 async def get_document(uid):
     document = db.get_document(uid)
     if not document:
-        raise HTTPException(
-            status_code=404, detail=f"Document {uid} not found")
+        raise HTTPException(status_code=404, detail=f"Document {uid} not found")
     return document
 
 
@@ -68,8 +68,7 @@ async def update_document(doc_id: str, simba_doc: SimbaDoc):
         success = db.update_document(doc_id, simba_doc)
 
         if not success:
-            raise HTTPException(
-                status_code=404, detail=f"Document {doc_id} not found")
+            raise HTTPException(status_code=404, detail=f"Document {doc_id} not found")
     except Exception as e:
         logger.error(f"Error in update_document: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -81,14 +80,15 @@ async def delete(uids: List[str]):
         # Delete documents from vector store
         for uid in uids:
             simbadoc = db.get_document(uid)
+            res = await storage.delete_file(f"{simbadoc.metadata.filename}")
             if simbadoc.metadata.enabled:
                 for doc in simbadoc.documents:
                     try:
                         store.delete_documents([doc.id])
                     except Exception as e:
                         logger.error(
-                            f"Error deleting document with id {doc.id} in vector store")
-
+                            f"Error deleting document with id {doc.id} in vector store"
+                        )
         # Delete documents from database
         db.delete_documents(uids)
 
@@ -103,7 +103,9 @@ async def delete(uids: List[str]):
 async def get_loaders():
     """Get supported document loaders"""
     return {
-        "loaders": [loader_name.__name__ for loader_name in loader.SUPPORTED_EXTENSIONS.values()]
+        "loaders": [
+            loader_name.__name__ for loader_name in loader.SUPPORTED_EXTENSIONS.values()
+        ]
     }
 
 

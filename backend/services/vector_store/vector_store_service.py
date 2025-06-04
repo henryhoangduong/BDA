@@ -138,8 +138,7 @@ class VectorStoreService:
                     f"Embedding dimension mismatch: Index has {store.index.d}D vs Model has {embedding_dim}D"
                 )
         else:
-            logging.info(
-                f"Initializing new FAISS index with dimension {embedding_dim}")
+            logging.info(f"Initializing new FAISS index with dimension {embedding_dim}")
             index = faiss.IndexFlatL2(embedding_dim)
             store = FAISS(
                 embedding_function=self.embeddings,

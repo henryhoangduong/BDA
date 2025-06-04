@@ -5,11 +5,11 @@ from typing import Dict, Optional
 
 from fastapi import UploadFile
 from storage3.exceptions import StorageApiError
-from supabase import Client
 
 from core.config import settings
 from services.auth.supabase_client import SupabaseClientSingleton
 from services.storage.base import StorageProvider
+from supabase import Client
 
 logger = logging.getLogger(__name__)
 
@@ -66,10 +66,8 @@ class SupabaseStorageProvider(StorageProvider):
 
             # Upload to Supabase
             with open(local_file_path, "rb") as f:
-                self.client.storage.from_(self.bucket).upload(
-                    object_name,
-                    f,
-                    {"content-type": file.content_type}
+                result = self.client.storage.from_(self.bucket).upload(
+                    object_name, f, {"content-type": file.content_type}
                 )
 
             # Reset file pointer for subsequent reads
@@ -96,8 +94,7 @@ class SupabaseStorageProvider(StorageProvider):
 
             # If not, get from Supabase
             object_name = str(file_path).replace("\\", "/")
-            response = self.client.storage.from_(
-                self.bucket).download(object_name)
+            response = self.client.storage.from_(self.bucket).download(object_name)
             return response
 
         except Exception as e:
@@ -107,9 +104,17 @@ class SupabaseStorageProvider(StorageProvider):
     async def delete_file(self, file_path: Path) -> bool:
         """Delete a file from Supabase storage"""
         try:
-            # Delete from Supabase
+            logger.info("Getting bucket name")
             object_name = str(file_path).replace("\\", "/")
-            self.client.storage.from_(self.bucket).remove([object_name])
+            logger.info(f"Found file with object name: {object_name}")
+
+            try:
+                res = self.client.storage.from_(self.bucket).remove([object_name])
+                logger.info(
+                    f"Response after deleting file from supabase storage: {res}"
+                )
+            except Exception as e:
+                logger.error(f"Error deleting file from supabase storage: {e}")
 
             # Delete local copy if exists
             if str(file_path) in self.path_mapping:
@@ -139,6 +144,5 @@ class SupabaseStorageProvider(StorageProvider):
             return True
 
         except Exception as e:
-            logger.error(
-                f"Error checking file existence in Supabase: {str(e)}")
+            logger.error(f"Error checking file existence in Supabase: {str(e)}")
             return False
