@@ -1,6 +1,7 @@
 """
 Abstract base class for database services in Simba.
 """
+
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union
 

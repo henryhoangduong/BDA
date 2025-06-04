@@ -20,12 +20,10 @@ logger.info(f"Using current working directory as base: {BASE_DIR}")
 env_path = BASE_DIR / ".env"
 if env_path.exists():
     load_dotenv(env_path)
-    logger.info(
-        f"✅ Successfully loaded environment variables from: {env_path}")
+    logger.info(f"✅ Successfully loaded environment variables from: {env_path}")
 else:
     logger.warning(f"⚠️ No .env file found at: {env_path}")
-    logger.info(
-        "Using default environment variables or system environment variables")
+    logger.info("Using default environment variables or system environment variables")
 
 critical_env_vars = {
     "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
@@ -38,12 +36,14 @@ critical_env_vars = {
 }
 
 if os.getenv("STORAGE_PROVIDER", "local").lower() == "minio":
-    critical_env_vars.update({
-        "MINIO_ENDPOINT": os.getenv("MINIO_ENDPOINT"),
-        "MINIO_ACCESS_KEY": os.getenv("MINIO_ACCESS_KEY"),
-        "MINIO_SECRET_KEY": os.getenv("MINIO_SECRET_KEY"),
-        "MINIO_BUCKET": os.getenv("MINIO_BUCKET"),
-    })
+    critical_env_vars.update(
+        {
+            "MINIO_ENDPOINT": os.getenv("MINIO_ENDPOINT"),
+            "MINIO_ACCESS_KEY": os.getenv("MINIO_ACCESS_KEY"),
+            "MINIO_SECRET_KEY": os.getenv("MINIO_SECRET_KEY"),
+            "MINIO_BUCKET": os.getenv("MINIO_BUCKET"),
+        }
+    )
 
 for var_name, var_value in critical_env_vars.items():
     if var_value:
@@ -153,100 +153,80 @@ class CelerySettings(BaseModel):
 
 class StorageSettings(BaseSettings):
     """Storage configuration settings"""
+
     provider: str = Field(
         default="local",
-        description="Storage provider type: 'local', 'minio', or 'supabase'"
+        description="Storage provider type: 'local', 'minio', or 'supabase'",
     )
     minio_endpoint: Optional[str] = Field(
-        default=None,
-        description="MinIO server endpoint",
-        env="MINIO_ENDPOINT"
+        default=None, description="MinIO server endpoint", env="MINIO_ENDPOINT"
     )
     minio_access_key: Optional[str] = Field(
-        default=None,
-        description="MinIO access key",
-        env="MINIO_ACCESS_KEY"
+        default=None, description="MinIO access key", env="MINIO_ACCESS_KEY"
     )
     minio_secret_key: Optional[str] = Field(
-        default=None,
-        description="MinIO secret key",
-        env="MINIO_SECRET_KEY"
+        default=None, description="MinIO secret key", env="MINIO_SECRET_KEY"
     )
     minio_bucket: Optional[str] = Field(
-        default=None,
-        description="MinIO bucket name",
-        env="MINIO_BUCKET"
+        default=None, description="MinIO bucket name", env="MINIO_BUCKET"
     )
     minio_secure: bool = Field(
-        default=False,
-        description="Use secure connection to MinIO",
-        env="MINIO_SECURE"
+        default=False, description="Use secure connection to MinIO", env="MINIO_SECURE"
     )
     supabase_bucket: Optional[str] = Field(
         default="documents",
         description="Supabase storage bucket name",
-        env="SUPABASE_STORAGE_BUCKET"
+        env="SUPABASE_STORAGE_BUCKET",
     )
 
 
 class SupabaseSettings(BaseSettings):
     """Supabase configuration settings"""
-    url: str = Field(
-        default="",
-        description="Supabase project URL",
-        env="SUPABASE_URL"
-    )
+
+    url: str = Field(default="", description="Supabase project URL", env="SUPABASE_URL")
     key: str = Field(
         default="",
         description="Supabase anon/public key",
-        env="SUPABASE_ANON_KEY,ANON_KEY"  # Try both keys for compatibility
+        env="SUPABASE_ANON_KEY,ANON_KEY",  # Try both keys for compatibility
     )
     service_role_key: str = Field(
         default="",
         description="Supabase service role key for admin access",
-        env="SERVICE_ROLE_KEY"
+        env="SERVICE_ROLE_KEY",
     )
     jwt_secret: str = Field(
         default="",
         description="Supabase JWT secret for token verification",
-        env="JWT_SECRET"
+        env="JWT_SECRET",
     )
 
 
 class PostgresSettings(BaseSettings):
     """PostgreSQL database settings"""
+
     model_config = ConfigDict(
-        env_prefix="", env_file=".env", env_file_encoding="utf-8", extra="ignore")
+        env_prefix="", env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
     user: str = Field(
-        default="postgres",
-        description="PostgreSQL username",
-        env="POSTGRES_USER"
+        default="postgres", description="PostgreSQL username", env="POSTGRES_USER"
     )
     password: str = Field(
-        default="",
-        description="PostgreSQL password",
-        env="POSTGRES_PASSWORD"
+        default="", description="PostgreSQL password", env="POSTGRES_PASSWORD"
     )
     host: str = Field(
-        default="localhost",
-        description="PostgreSQL host",
-        env="POSTGRES_HOST"
+        default="localhost", description="PostgreSQL host", env="POSTGRES_HOST"
     )
     port: str = Field(
-        default="5432",
-        description="PostgreSQL port",
-        env="POSTGRES_PORT"
+        default="5432", description="PostgreSQL port", env="POSTGRES_PORT"
     )
     db: str = Field(
-        default="postgres",
-        description="PostgreSQL database name",
-        env="POSTGRES_DB"
+        default="postgres", description="PostgreSQL database name", env="POSTGRES_DB"
     )
     connection_string: str = Field(
         default="",
         description="Full PostgreSQL connection string (if set, overrides individual settings)",
-        env="POSTGRES_CONNECTION_STRING,SUPABASE_CONNECTION_STRING"
+        env="POSTGRES_CONNECTION_STRING,SUPABASE_CONNECTION_STRING",
     )
 
     @property
@@ -261,8 +241,9 @@ class PostgresSettings(BaseSettings):
         # Load from environment first
         env_values = {}
         for field_name, field in self.__class__.model_fields.items():
-            env_var = field.json_schema_extra.get(
-                "env") if field.json_schema_extra else None
+            env_var = (
+                field.json_schema_extra.get("env") if field.json_schema_extra else None
+            )
             if isinstance(env_var, str):
                 env_vars = [env_var]
             elif isinstance(env_var, (list, tuple)):
@@ -285,6 +266,7 @@ class PostgresSettings(BaseSettings):
 
 class Settings(BaseSettings):
     """Application settings"""
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     project: ProjectConfig = Field(default_factory=ProjectConfig)

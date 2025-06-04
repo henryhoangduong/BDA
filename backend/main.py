@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.auth_routes import auth_router
 from api.chat_routes import chat
 from api.database_routes import database_route
 from api.dataset_routes import dataset_route
@@ -27,8 +28,7 @@ logger = logging.getLogger(__name__)
 
 logger.info("=" * 50)
 logger.info("Initializing Application Settings")
-logger.info(
-    f"TOKENIZERS_PARALLELISM set to: {os.environ['TOKENIZERS_PARALLELISM']}")
+logger.info(f"TOKENIZERS_PARALLELISM set to: {os.environ['TOKENIZERS_PARALLELISM']}")
 logger.info("=" * 50)
 
 
@@ -79,6 +79,7 @@ app.include_router(parsing, tags=["Parse"], prefix="/api")
 app.include_router(ingestion, tags=["Ingestion"], prefix="/api")
 app.include_router(embedding_route, tags=["Embedding"], prefix="/api")
 app.include_router(chat, tags=["Chat"], prefix="/api")
+app.include_router(auth_router)
 # app.include_router(database_route, tags=["Database"], prefix="/api")
 # app.include_router(dataset_route, tags=["Dataset"], prefix="/api")
 

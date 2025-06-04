@@ -1,15 +1,20 @@
+import uuid
 from typing import List, Optional
 
 from langchain.schema import Document
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-import uuid
 
 from core.factories.embeddings_factory import get_embeddings
 
 
 class Splitter:
-    def __init__(self, strategy: str = "recursive_character", chunk_size: int = 1500, chunk_overlap: int = 400):
+    def __init__(
+        self,
+        strategy: str = "recursive_character",
+        chunk_size: int = 1500,
+        chunk_overlap: int = 400,
+    ):
         """
         Initialize a document splitter with configurable strategy and parameters.
 
@@ -41,8 +46,7 @@ class Splitter:
         if not isinstance(documents, list) or not all(
             isinstance(doc, Document) for doc in documents
         ):
-            raise ValueError(
-                "Input must be a list of LangChain Document objects")
+            raise ValueError("Input must be a list of LangChain Document objects")
 
         # Choose splitting strategy
         if self.strategy == "recursive_character":
@@ -58,11 +62,12 @@ class Splitter:
         else:
             raise ValueError(f"Invalid strategy: {self.strategy}")
 
-    def recursive_character_text_splitter(self, documents: List[Document]) -> List[Document]:
+    def recursive_character_text_splitter(
+        self, documents: List[Document]
+    ) -> List[Document]:
         """Standard recursive character splitting"""
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap
+            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
         )
         documents = text_splitter.split_documents(documents)
         for doc in documents:

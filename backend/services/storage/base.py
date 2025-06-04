@@ -9,7 +9,6 @@ class StorageProvider(ABC):
 
     @abstractmethod
     async def save_file(self, file_path: Path, file: UploadFile) -> Path:
-
         pass
 
     @abstractmethod

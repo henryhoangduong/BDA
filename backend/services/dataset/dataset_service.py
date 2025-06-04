@@ -27,8 +27,8 @@ async def generate_qa_from_chunks(
                 "Please generate **one** question about the content above, "
                 "and provide its answer. "
                 "Respond in JSON format exactly like:\n"
-                '{{\"question\": \"<your question>\", \"answer\": \"<your answer>\"}}'
-            )
+                '{{"question": "<your question>", "answer": "<your answer>"}}'
+            ),
         )
 
         chain = LLMChain(llm=llm, prompt=prompt)
@@ -46,7 +46,8 @@ async def generate_qa_from_chunks(
                 qa = json.loads(json_str)
             except json.JSONDecodeError as e:
                 logger.warning(
-                    "Could not parse JSON from LLM output: %s\nError: %s", json_str, e)
+                    "Could not parse JSON from LLM output: %s\nError: %s", json_str, e
+                )
                 continue
 
             qas.append({**(chunk.model_dump()), **qa})
@@ -62,7 +63,7 @@ if __name__ == "__main__":
 
     chunks = [
         "Alice was beginning to get very tired of sitting by her sister on the bank...",
-        "The rabbit-hole went straight on like a tunnel for some way, and then dipped suddenly..."
+        "The rabbit-hole went straight on like a tunnel for some way, and then dipped suddenly...",
     ]
 
     qa_pairs = generate_qa_from_chunks(chunks)

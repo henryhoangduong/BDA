@@ -29,7 +29,9 @@ class DocumentIngestionService:
         self.splitter = Splitter()
         self.storage: StorageProvider = StorageFactory.get_storage_provider()
 
-    async def ingest_document(self, file: UploadFile, folder_path: str = "/") -> Document:
+    async def ingest_document(
+        self, file: UploadFile, folder_path: str = "/"
+    ) -> Document:
         try:
             from tasks.generate_summary import generate_summary_task
 

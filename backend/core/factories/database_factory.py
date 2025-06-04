@@ -5,8 +5,9 @@ from typing import Optional
 
 from core.config import settings
 from database.litedb_service import LiteDocumentDB
-from database.sqlite_service import SQLiteDocumentDB
 from database.postgres import PostgresDB
+from database.sqlite_service import SQLiteDocumentDB
+
 logger = logging.getLogger(__name__)
 
 

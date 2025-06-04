@@ -4,8 +4,9 @@ import torch
 
 from core.celery_config import celery_app as celery
 from core.factories.database_factory import get_database
-from services.parsing.docling_parser import DoclingParser
 from services.embeddings.embedding_service import EmbeddingService
+from services.parsing.docling_parser import DoclingParser
+
 logger = logging.getLogger(__name__)
 
 

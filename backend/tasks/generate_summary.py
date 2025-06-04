@@ -14,11 +14,13 @@ def generate_summary_task(simbadoc_dict: dict):
     try:
         simbadoc = SimbaDoc.model_validate(simbadoc_dict)
         logger.info(
-            f"[SUMMARY] Processing document: id={simbadoc.id}, filename={getattr(simbadoc.metadata, 'filename', None)}, metadata={simbadoc.metadata}")
+            f"[SUMMARY] Processing document: id={simbadoc.id}, filename={getattr(simbadoc.metadata, 'filename', None)}, metadata={simbadoc.metadata}"
+        )
         # Generate summary
         summary = summarize_document(simbadoc)
         logger.info(
-            f"[SUMMARY] Generated summary for document {simbadoc.id}: {summary}")
+            f"[SUMMARY] Generated summary for document {simbadoc.id}: {summary}"
+        )
 
         # Attach summary to metadata (as attribute and dict for compatibility)
         setattr(simbadoc.metadata, "summary", summary)
