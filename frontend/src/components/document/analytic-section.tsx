@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useQuery } from '@tanstack/react-query'
 import { ingestionQueryFn } from '@/lib/api'
-import { Database, TimerIcon } from 'lucide-react'
+import { Database, Loader2, TimerIcon } from 'lucide-react'
 
 const AnalyticSection = () => {
   const { data, isLoading } = useQuery({
@@ -20,7 +20,7 @@ const AnalyticSection = () => {
           </div>
         </CardHeader>
         <CardContent className='flex flex-row items-end gap-2'>
-          <p className='text-6xl font-semibold'>{data?.length}</p>
+          <p className='text-6xl font-semibold'>{isLoading ? <Loader2 className='animate-spin' /> : data?.length}</p>
           <p className='text-muted-foreground'>documents</p>
         </CardContent>
       </Card>

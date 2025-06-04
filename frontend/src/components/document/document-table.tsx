@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardHeader } from '../ui/card'
-import { embeddingDocumentByIdMutationFn, ingestionQueryFn } from '@/lib/api'
+import { embeddingDocumentByIdMutationFn, ingestionQueryFn, parseDocMutationFn } from '@/lib/api'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import FileActions from './file-actions'
 import { Switch } from '../ui/switch'
@@ -22,6 +22,7 @@ const DocumentTable = ({ uploadButton }: Props) => {
   const { mutate, isPending } = useMutation({
     mutationFn: embeddingDocumentByIdMutationFn
   })
+
   const queryClient = useQueryClient()
   const handleEmbedding = (value: string) => {
     if (isPending) return
@@ -46,6 +47,7 @@ const DocumentTable = ({ uploadButton }: Props) => {
       }
     })
   }
+
   return (
     <Card className='p-4'>
       <CardHeader className='p-4 flex flex-row items-center'>
@@ -77,7 +79,7 @@ const DocumentTable = ({ uploadButton }: Props) => {
                 <FileInformation
                   trigger={
                     <TableCell className='flex flex-row items-center gap-2 font-medium text-left cursor-pointer hover:underline'>
-                      <FileText />
+                      <FileText className='w-[10px]' />
                       {item.metadata.filename}
                     </TableCell>
                   }
@@ -96,7 +98,7 @@ const DocumentTable = ({ uploadButton }: Props) => {
                   />
                 </TableCell>
                 <TableCell className='text-center'>
-                  <ParsingStatus status={(item.metadata.parsing_status as string) || ''} />
+                  <ParsingStatus document_id={item.id} />
                 </TableCell>
                 <TableCell className='text-center'>
                   <FileActions doc_id={item.id} />
