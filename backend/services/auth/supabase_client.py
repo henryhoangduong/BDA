@@ -48,7 +48,8 @@ class SupabaseClientSingleton:
                 )
 
             try:
-                logger.info(f"Initializing Supabase client with URL: {supabase_url}")
+                logger.info(
+                    f"Initializing Supabase client with URL: {supabase_url}")
 
                 # Create client with timeout options
                 cls._instance = create_client(
