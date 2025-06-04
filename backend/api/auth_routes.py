@@ -3,7 +3,9 @@ from typing import Dict, Optional
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
+
 from services.auth.auth_service import AuthService
+
 logger = logging.getLogger(__name__)
 
 auth_router = APIRouter(

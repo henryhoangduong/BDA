@@ -28,7 +28,8 @@ logger = logging.getLogger(__name__)
 
 logger.info("=" * 50)
 logger.info("Initializing Application Settings")
-logger.info(f"TOKENIZERS_PARALLELISM set to: {os.environ['TOKENIZERS_PARALLELISM']}")
+logger.info(
+    f"TOKENIZERS_PARALLELISM set to: {os.environ['TOKENIZERS_PARALLELISM']}")
 logger.info("=" * 50)
 
 

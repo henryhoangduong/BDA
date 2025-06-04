@@ -129,3 +129,18 @@ class RoleService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to fetch role permissions",
             )
+
+    @staticmethod
+    def has_role(user_id: str, role_name: str):
+        try:
+            row = PostgresDB.fetch_one("""
+                SELECT 1
+                FROM roles r
+                JOIN user_roles ur ON ur.role_id=r.id
+                WHERE ur.user_id = %s AND r.name = %s
+                LIMIT 1
+                                       """)
+            return row is not None
+        except Exception as e:
+            logger.error(f"Failed to check user role: {str(e)}")
+            return False
