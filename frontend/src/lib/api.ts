@@ -123,8 +123,8 @@ export const embeddingDocumentByIdMutationFn = async (doc_id: string) => {
   return res.data
 }
 //***************************** PARSING *****************************
-export const parseDocMutationFn = async (doc_id: string, parser = 'docling') => {
-  const response = await API.post('parses', { data: doc_id, parser })
+export const parseDocMutationFn = async (document_id: string, parser = 'docling') => {
+  const response = await API.post('parses', { document_id: document_id, parser })
   return response.data
 }
 export const getParsersQueryFn = async () => {

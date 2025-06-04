@@ -47,7 +47,7 @@ const FileInformation = ({ trigger, doc_id }: Props) => {
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.chunk_number}</dd>
 
               <dt className='font-medium text-sm text-gray-700'>Parsing Status: </dt>
-              <ParsingStatus status={data?.metadata.parsing_status as string} />
+              <ParsingStatus document_id={doc_id} />
 
               <dt className='font-medium text-sm text-gray-700'>Size: </dt>
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.size}</dd>
