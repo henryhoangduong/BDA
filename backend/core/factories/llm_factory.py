@@ -4,6 +4,7 @@ from typing import Optional
 from langchain_community.llms import VLLM
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from core.config import LLMConfig, settings
 
@@ -38,7 +39,12 @@ def get_llm(LLM: Optional[LLMConfig] = None):
             temperature=settings.llm.temperature,
             streaming=settings.llm.streaming,
         )
-
+    elif settings.llm.provider == "google":
+        return ChatGoogleGenerativeAI(
+            model=settings.llm.model_name,
+            temperature=settings.llm.temperature,
+            streaming=settings.llm.streaming,
+        )
     elif settings.llm.provider == "anthropic":
         return """ChatAnthropic(
             model=settings.llm.model_name,

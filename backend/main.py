@@ -1,17 +1,19 @@
-from core.utils.logger import setup_logging
-from core.config import settings
-from api.parsing_routes import parsing
-from api.ingestion_routes import ingestion
-from api.embedding_routes import embedding_route
+import logging
+import os
+from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from api.chat_routes import chat
 from api.database_routes import database_route
 from api.dataset_routes import dataset_route
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI
-from dotenv import load_dotenv
-from contextlib import asynccontextmanager
-import logging
-import os
+from api.embedding_routes import embedding_route
+from api.ingestion_routes import ingestion
+from api.parsing_routes import parsing
+from core.config import settings
+from core.utils.logger import setup_logging
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
@@ -77,8 +79,8 @@ app.include_router(parsing, tags=["Parse"], prefix="/api")
 app.include_router(ingestion, tags=["Ingestion"], prefix="/api")
 app.include_router(embedding_route, tags=["Embedding"], prefix="/api")
 app.include_router(chat, tags=["Chat"], prefix="/api")
-app.include_router(database_route, tags=["Database"], prefix="/api")
-app.include_router(dataset_route, tags=["Dataset"], prefix="/api")
+# app.include_router(database_route, tags=["Database"], prefix="/api")
+# app.include_router(dataset_route, tags=["Dataset"], prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn

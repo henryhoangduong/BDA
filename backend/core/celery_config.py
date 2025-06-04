@@ -3,10 +3,17 @@ import logging
 import torch
 from celery import Celery
 from celery.signals import worker_init, worker_shutdown, worker_shutting_down
-
+from dotenv import load_dotenv
 from core.config import settings
-
+import os
+load_dotenv()
 logger = logging.getLogger(__name__)
+
+UPSTASH_REDIS_HOST = os.getenv("UPSTASH_REDIS_HOST")
+UPSTASH_REDIS_PORT = os.getenv("UPSTASH_REDIS_PORT")
+UPSTASH_REDIS_PASSWORD = os.getenv("UPSTASH_REDIS_PASSWORD")
+
+connection_link = f"rediss://:{UPSTASH_REDIS_PASSWORD}@{UPSTASH_REDIS_HOST}:{UPSTASH_REDIS_PORT}?ssl_cert_reqs=required"
 
 
 def get_celery_config():
@@ -14,8 +21,8 @@ def get_celery_config():
     Returns the Celery configuration dictionary with all settings
     """
     return {
-        "broker_url": settings.celery.broker_url,
-        "result_backend": settings.celery.result_backend,
+        "broker_url": connection_link,
+        "result_backend": connection_link,
         "task_serializer": "json",
         "accept_content": ["json"],
         "result_serializer": "json",
@@ -64,4 +71,4 @@ def create_celery_app():
 
 
 # Create the celery application
-celery_app = create_celery_app() if settings.features.enable_parsers else None
+celery_app = create_celery_app()

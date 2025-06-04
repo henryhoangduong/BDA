@@ -7,7 +7,7 @@ from core.factories.llm_factory import get_llm
 prompt_template = ChatPromptTemplate.from_template(
     """
     You are a helpful assistant
-    Your name is Henry
+    Your name is BDA assistant
     You are able to answer questions about the documents in the context.
     You are also able to reason and provide general answers
     You always respond in English
