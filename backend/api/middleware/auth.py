@@ -86,3 +86,50 @@ def require_role(role: str):
                 detail="Failed to verify role",
             )
     return dependency
+
+
+def require_permission(permission: str):
+    """Dependency for permission-based access control.
+
+    Args:
+        permission: Required permission
+
+    Returns:
+        callable: Dependency function
+    """
+    async def dependency(current_user: dict = Depends(get_current_user)):
+        user_id = current_user.get("id")
+
+        # For API keys with fixed permissions, we currently only support role-based checks
+        # You might want to extend this to map roles to permissions for API keys
+        if current_user.get("auth_type") == "api_key":
+            logger.warning(
+                f"Permission check for API key not supported, use role-based checks instead")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"API keys currently only support role-based authorization",
+            )
+
+        try:
+            # Check if user has the required permission
+            has_permission = RoleService.has_permission(user_id, permission)
+
+            if not has_permission:
+                logger.warning(
+                    f"Access denied: User {user_id} does not have permission {permission}")
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Access denied: Permission '{permission}' required",
+                )
+
+            return current_user
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Permission check error: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to verify permission",
+            )
+
+    return dependency
