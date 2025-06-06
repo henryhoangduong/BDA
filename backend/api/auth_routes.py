@@ -1,10 +1,13 @@
 import logging
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from api.middleware.auth import get_current_user
+from models.role import Permission, Role
 from services.auth.auth_service import AuthService
+from services.roles.role_services import RoleService
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +15,15 @@ auth_router = APIRouter(
     prefix=f"/auth",
     tags=["auth"],
 )
+
+
+class UserMeResponse(BaseModel):
+    id: str
+    email: str
+    created_at: str
+    metadata: Optional[Dict]
+    roles: List[Role]
+    permissions: List[Permission]
 
 
 class RefreshTokenRequest(BaseModel):
@@ -100,4 +112,32 @@ async def refresh_token(request: RefreshTokenRequest):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred"
+        )
+
+
+@auth_router.get("/me", response_model=UserMeResponse)
+async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    """
+    Get complete information about the currently authenticated user,
+    including their roles and permissions.
+    """
+    try:
+        # Get user's roles and permissions
+        role_service = RoleService()
+        roles = role_service.get_user_roles(current_user["id"])
+        permissions = role_service.get_user_permissions(current_user["id"])
+
+        return UserMeResponse(
+            id=current_user["id"],
+            email=current_user["email"],
+            created_at=current_user.get("created_at", ""),
+            metadata=current_user.get("metadata", {}),
+            roles=roles,
+            permissions=permissions
+        )
+    except Exception as e:
+        logger.error(f"Failed to get user info: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get user information"
         )

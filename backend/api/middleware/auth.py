@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import (APIKeyHeader, HTTPAuthorizationCredentials,
                               HTTPBearer)
+
 from services.auth.role_service import RoleService
 from services.auth.supabase_client import get_supabase_client
 
