@@ -1,7 +1,6 @@
 import { SimbaDoc } from '@/types/document'
 import { API } from './axios-client'
 import { config } from '@/config/config'
-import { data } from 'react-router-dom'
 
 //***************************** INGESTION *****************************
 export const ingestionMutationFn = async (files: FormData[]) => {

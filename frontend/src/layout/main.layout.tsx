@@ -1,5 +1,4 @@
 import AppSidebar from '@/components/app-sidebar'
-import Header from '@/components/header'
 import { Outlet } from 'react-router-dom'
 export const MainLayout = () => {
   return (

@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react'
 import { ActiveTable } from 'active-table-react'
 import { useQuery } from '@tanstack/react-query'
 import { ingestionByIdQueryFn } from '@/lib/api'
-import { Loader, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 const DatasetPage = () => {
   const { data: chunkData, isLoading } = useQuery({
