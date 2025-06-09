@@ -1,16 +1,10 @@
-from typing import List, cast
+from typing import List
 
 from fastapi import APIRouter, HTTPException
-
-from core.factories.database_factory import get_database
-from core.factories.vector_store_factory import VectorStoreFactory
-from models.simbadoc import SimbaDoc
 from services.embeddings.embedding_service import EmbeddingService
-
 embedding_route = APIRouter()
 
-db = get_database()
-store = VectorStoreFactory.get_vector_store()
+# Initialize the embedding service
 embedding_service = EmbeddingService()
 
 
@@ -24,7 +18,7 @@ async def embed_documents():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@embedding_route.post("/embed/document/{doc_id}")
+@embedding_route.post("/embed/document")
 async def embed_document(doc_id: str):
     """Embed a specific document into the vector store."""
     try:
@@ -32,5 +26,47 @@ async def embed_document(doc_id: str):
         return langchain_documents
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@embedding_route.get("/embedded_documents")
+async def get_embedded_documents():
+    """Get all documents from the vector store."""
+    try:
+        docs = embedding_service.get_embedded_documents()
+        return docs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@embedding_route.delete("/embed/document/chunk")
+async def delete_document_chunk(chunk_ids: List[str]):
+    """Delete a list of document chunks from the vector store."""
+    try:
+        result = embedding_service.delete_document_chunks(chunk_ids)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@embedding_route.delete("/embed/document")
+async def delete_document(doc_id: str):
+    """Delete all chunks of a document from the vector store."""
+    try:
+        result = embedding_service.delete_document(doc_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@embedding_route.delete("/embed/clear_store")
+async def clear_store():
+    """Clear the entire vector store."""
+    try:
+        result = embedding_service.clear_store()
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

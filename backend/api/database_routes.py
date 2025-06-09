@@ -3,35 +3,38 @@ from typing import cast
 from fastapi import APIRouter
 
 from core.factories.database_factory import get_database
-from models.simbadoc import SimbaDoc
 from services.ingestion.document_ingestion import DocumentIngestionService
+from models.simbadoc import SimbaDoc
 
-database_route = APIRouter()
+database_route = APIRouter(prefix="/database", tags=["database"])
 
 db = get_database()
 kms = DocumentIngestionService()
 
 
-@database_route.get("/database/info")
+@database_route.get("/info")
 async def get_database_info():
-    return db.__class__.__name__
+    return db.__name__
 
 
-@database_route.get("/database/documents")
+@database_route.get("/documents")
 async def get_database_documents():
+    # kms.sync_with_store()
     return db.get_all_documents()
 
 
-@database_route.get("/database/langchain_documents")
+@database_route.get("/langchain_documents")
 async def get_langchain_documents():
     all_documents = db.get_all_documents()
+    # to SimbaDoc
     simba_documents = [cast(SimbaDoc, doc) for doc in all_documents]
+    # to Langchain documents
     langchain_documents = [simbadoc.documents for simbadoc in simba_documents]
 
     return langchain_documents
 
 
-@database_route.delete("/database/clear_database")
+@database_route.delete("/clear_database")
 async def clear_database():
     db.clear_database()
     return {"message": "Database cleared"}

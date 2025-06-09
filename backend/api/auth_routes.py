@@ -12,7 +12,7 @@ from services.roles.role_services import RoleService
 logger = logging.getLogger(__name__)
 
 auth_router = APIRouter(
-    prefix=f"/auth",
+    prefix=f"/api/auth",
     tags=["auth"],
 )
 
