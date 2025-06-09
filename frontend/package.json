@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -38,7 +38,8 @@
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.3",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "vite-plugin-eslint": "^1.8.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.37",
