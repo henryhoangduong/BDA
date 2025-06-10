@@ -76,5 +76,6 @@ def get_embeddings(**kwargs) -> Embeddings:
                 **kwargs,
             )
     except Exception as e:
-        logger.error(f"Error creating embeddings for provider {provider}: {e}")
+        logger.error(
+            f"Error creating embeddings for provider {settings.embedding.provider}: {e}")
         raise

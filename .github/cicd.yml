@@ -1,0 +1,18 @@
+name: CICD
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Source
+              uses: actions/checkout@v3
+            - name: Login to Docker Hub
+              run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            - name: Build Docker Image
+              run: docker build t henryhoangduong/bda-backend ./backend
+            - name: Publish image to docker hub
+              run: docker push  henryhoangduong/bda-backend:latest

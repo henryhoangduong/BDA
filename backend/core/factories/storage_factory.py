@@ -4,14 +4,12 @@ from typing import Dict, Type
 from core.config import settings
 from services.storage.base import StorageProvider
 from services.storage.local import LocalStorageProvider
-from services.storage.minio import MinIOStorageProvider
 from services.storage.supabase_storage import SupabaseStorageProvider
 
 
 class StorageFactory:
     _providers: Dict[str, Type[StorageProvider]] = {
         "local": LocalStorageProvider,
-        "minio": MinIOStorageProvider,
         "supabase": SupabaseStorageProvider,
     }
 
