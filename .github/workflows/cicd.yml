@@ -13,6 +13,24 @@ jobs:
             - name: Login to Docker Hub
               run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             - name: Build Docker Image
-              run: docker build -t henryhoangduong/bda-backend ./backend
+              run: |
+                  docker build \
+                  --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+                  --build-arg LANGCHAIN_API_KEY=${{ secrets.LANGCHAIN_API_KEY }} \
+                  --build-arg MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }} \
+                  --build-arg REDIS_HOST=${{ secrets.REDIS_HOST }} \
+                  --build-arg CELERY_BROKER_URL=${{ secrets.CELERY_BROKER_URL }} \
+                  --build-arg CELERY_RESULT_BACKEND=${{ secrets.CELERY_RESULT_BACKEND }} \
+                  --build-arg SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+                  --build-arg SUPABASE_JWT_SECRET=${{ secrets.SUPABASE_JWT_SECRET }} \
+                  --build-arg ANON_KEY=${{ secrets.ANON_KEY }} \
+                  --build-arg SUPABASE_PUBLIC_KEY=${{ secrets.SUPABASE_PUBLIC_KEY }} \
+                  --build-arg POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
+                  --build-arg POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
+                  --build-arg POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+                  --build-arg POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+                  --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+                  -t henryhoangduong/bda-backend:latest \
+                  ./backend
             - name: Publish image to docker hub
               run: docker push  henryhoangduong/bda-backend:latest
