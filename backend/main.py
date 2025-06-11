@@ -64,6 +64,9 @@ async def lifespan(app: FastAPI):
     logger.info(f"Upload Directory: {settings.paths.upload_dir}")
     logger.info(f"Vector Store Directory: {settings.paths.vector_store_dir}")
 
+    # Frontend origin
+    logger.info(f"\n Frontend Origin: {os.getenv("FRONTEND_ORIGIN")}")
+
     logger.info("=" * 50)
     yield
 
