@@ -3,10 +3,11 @@ FROM python:3.12-slim-bullseye
 # Install uv.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-# Copy the application into the container.
+RUN groupadd --system appgroup && \
+    useradd --system --gid appgroup --home-dir /app --create-home appuser
+
 COPY . /app
 
-# Install the application dependencies.
 WORKDIR /app
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -69,4 +70,5 @@ COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8080
+USER appuser
 ENTRYPOINT ["/app/entrypoint.sh"]

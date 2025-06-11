@@ -6,3 +6,5 @@
 /app/.venv/bin/celery \
   -A core.celery_config.celery_app worker \
   --loglevel=info -Q parsing
+  --uid 1000 \
+  --gid 1000
