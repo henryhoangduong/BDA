@@ -5,6 +5,7 @@ on:
             - master
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY}}
   LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
   MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
   REDIS_HOST: ${{ secrets.REDIS_HOST }}
@@ -19,7 +20,9 @@ env:
   POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
   POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
   POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-
+  UPSTASH_REDIS_HOST: ${{ secrets.UPSTASH_REDIS_HOST }}
+  UPSTASH_REDIS_PASSWORD: ${{ secrets.UPSTASH_REDIS_PASSWORD }}
+  UPSTASH_REDIS_PORT: ${{ secrets.UPSTASH_REDIS_PORT }}
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -32,6 +35,7 @@ jobs:
               run: |
                   docker build \
                   --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+                  --build-arg GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }} \
                   --build-arg LANGCHAIN_API_KEY=${{ secrets.LANGCHAIN_API_KEY }} \
                   --build-arg MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }} \
                   --build-arg REDIS_HOST=${{ secrets.REDIS_HOST }} \
@@ -46,6 +50,9 @@ jobs:
                   --build-arg POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
                   --build-arg POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
                   --build-arg POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+                  --build-arg UPSTASH_REDIS_HOST=${{ secrets.UPSTASH_REDIS_HOST }} \
+                  --build-arg UPSTASH_REDIS_PASSWORD=${{ secrets.UPSTASH_REDIS_PASSWORD }} \
+                  --build-arg UPSTASH_REDIS_PORT=${{ secrets.UPSTASH_REDIS_PORT }} \
                   -t henryhoangduong/bda-backend:latest \
                   ./backend
             - name: Publish image to docker hub
