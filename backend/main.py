@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI):
     logger.info(f"Vector Store Directory: {settings.paths.vector_store_dir}")
 
     # Frontend origin
-    logger.info(f"\n Frontend Origin: {os.getenv("FRONTEND_ORIGIN")}")
+    logger.info('Frontend Origin: ' + str(os.getenv("FRONTEND_ORIGIN")))
 
     logger.info("=" * 50)
     yield
