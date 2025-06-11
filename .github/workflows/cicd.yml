@@ -34,7 +34,6 @@ jobs:
             - name: Build Docker Image
               run: |
                   docker build --no-cache \
-                  
                   --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
                   --build-arg GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }} \
                   --build-arg LANGCHAIN_API_KEY=${{ secrets.LANGCHAIN_API_KEY }} \
