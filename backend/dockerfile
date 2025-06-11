@@ -3,9 +3,6 @@ FROM python:3.12-slim-bullseye
 # Install uv.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-RUN groupadd --system appgroup && \
-    useradd --system --gid appgroup --home-dir /app --create-home appuser
-
 COPY . /app
 
 WORKDIR /app
@@ -79,5 +76,4 @@ COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8080
-USER appuser
 ENTRYPOINT ["/app/entrypoint.sh"]
