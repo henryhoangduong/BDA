@@ -54,6 +54,7 @@ jobs:
                   --build-arg UPSTASH_REDIS_PASSWORD=${{ secrets.UPSTASH_REDIS_PASSWORD }} \
                   --build-arg UPSTASH_REDIS_PORT=${{ secrets.UPSTASH_REDIS_PORT }} \
                   -t henryhoangduong/bda-backend:latest \
+                  --no-cache
                   ./backend
             - name: Publish image to docker hub
               run: docker push  henryhoangduong/bda-backend:latest
