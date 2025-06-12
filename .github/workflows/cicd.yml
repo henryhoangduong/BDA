@@ -24,6 +24,9 @@ env:
   UPSTASH_REDIS_PASSWORD: ${{ secrets.UPSTASH_REDIS_PASSWORD }}
   UPSTASH_REDIS_PORT: ${{ secrets.UPSTASH_REDIS_PORT }}
   FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
+  REDIS_HOST: ${{ secrets.REDIS_HOST }}
+  CELERY_BROKER_URL: ${{ secrets.CELERY_BROKER_URL }}
+  CELERY_RESULT_BACKEND: ${{ secrets.CELERY_RESULT_BACKEND }}
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -55,6 +58,9 @@ jobs:
                   --build-arg UPSTASH_REDIS_PASSWORD=${{ secrets.UPSTASH_REDIS_PASSWORD }} \
                   --build-arg UPSTASH_REDIS_PORT=${{ secrets.UPSTASH_REDIS_PORT }} \
                   --build-arg FRONTEND_ORIGIN=${{ secrets.FRONTEND_ORIGIN }} \
+                  --build-arg REDIS_HOST=${{ secrets.REDIS_HOST }} \
+                  --build-arg CELERY_BROKER_URL=${{ secrets.CELERY_BROKER_URL }} \
+                  --build-arg CELERY_RESULT_BACKEND=${{ secrets.CELERY_RESULT_BACKEND }} \
                   -t henryhoangduong/bda-backend:latest \
                   ./backend
             - name: Publish image to docker hub
