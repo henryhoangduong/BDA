@@ -20,10 +20,12 @@ logger.info(f"Using current working directory as base: {BASE_DIR}")
 env_path = BASE_DIR / ".env"
 if env_path.exists():
     load_dotenv(env_path)
-    logger.info(f"✅ Successfully loaded environment variables from: {env_path}")
+    logger.info(
+        f"✅ Successfully loaded environment variables from: {env_path}")
 else:
     logger.warning(f"⚠️ No .env file found at: {env_path}")
-    logger.info("Using default environment variables or system environment variables")
+    logger.info(
+        "Using default environment variables or system environment variables")
 
 critical_env_vars = {
     "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
@@ -183,7 +185,8 @@ class StorageSettings(BaseSettings):
 class SupabaseSettings(BaseSettings):
     """Supabase configuration settings"""
 
-    url: str = Field(default="", description="Supabase project URL", env="SUPABASE_URL")
+    url: str = Field(
+        default="", description="Supabase project URL", env="SUPABASE_URL")
     key: str = Field(
         default="",
         description="Supabase anon/public key",
@@ -242,7 +245,8 @@ class PostgresSettings(BaseSettings):
         env_values = {}
         for field_name, field in self.__class__.model_fields.items():
             env_var = (
-                field.json_schema_extra.get("env") if field.json_schema_extra else None
+                field.json_schema_extra.get(
+                    "env") if field.json_schema_extra else None
             )
             if isinstance(env_var, str):
                 env_vars = [env_var]
@@ -281,6 +285,7 @@ class Settings(BaseSettings):
     storage: StorageSettings = StorageSettings()
     supabase: SupabaseSettings = SupabaseSettings()
     postgres: PostgresSettings = PostgresSettings()
+    frontend_origin:str = os.getenv("FRONTEND_ORIGIN")
 
     @field_validator("celery")
     @classmethod
