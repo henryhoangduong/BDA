@@ -1,9 +1,13 @@
-import { SimbaDoc } from '@/types/document'
 import { API } from './axios-client'
-import { config } from '@/config/config'
 
+import { config } from '@/config/config'
+import { User } from '@/types/auth'
+import { SimbaDoc } from '@/types/document'
+
+//*********************************************************************
 //***************************** INGESTION *****************************
-export const ingestionMutationFn = async (files: FormData[]) => {
+//*********************************************************************
+const ingestionMutationFn = async (files: FormData[]) => {
   const form = new FormData()
   Array.from(files).forEach((file) => {
     form.append('files', file)
@@ -16,24 +20,27 @@ export const ingestionMutationFn = async (files: FormData[]) => {
 
   return res.data
 }
-export const ingestionQueryFn = async (): Promise<SimbaDoc[]> => {
+const ingestionQueryFn = async (): Promise<SimbaDoc[]> => {
   const res = await API.get('ingestion')
   return res.data
 }
-export const ingestionByIdQueryFn = async (doc_id: string): Promise<SimbaDoc> => {
+const ingestionByIdQueryFn = async (doc_id: string): Promise<SimbaDoc> => {
   const res = await API.get(`ingestion/${doc_id}`)
   return res.data
 }
-export const ingestionTasksQueryFn = async () => {
+const ingestionTasksQueryFn = async () => {
   const res = await API.put('')
   return res.data
 }
-export const ingestionDeleteMutationFn = async (doc_ids: string[]) => {
+const ingestionDeleteMutationFn = async (doc_ids: string[]) => {
   const res = await API.delete(`ingestion`, { data: doc_ids })
   return res.data
 }
-//***************************** CHAT *****************************
-export async function sendMessage(message: string): Promise<Response> {
+
+//*********************************************************************
+//***************************** CHAT **********************************
+//*********************************************************************
+const sendMessage = async (message: string): Promise<Response> => {
   try {
     const response = await fetch(`${config.apiUrl}chat`, {
       method: 'POST',
@@ -56,11 +63,11 @@ export async function sendMessage(message: string): Promise<Response> {
   }
 }
 
-export async function handleChatStream(
+const handleChatStream = async (
   response: Response,
   onChunk: (content: string, state: any) => void,
   onComplete: () => void
-): Promise<void> {
+): Promise<void> => {
   const reader = response.body?.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
@@ -114,27 +121,87 @@ export async function handleChatStream(
     onComplete()
   }
 }
+//*********************************************************************
+//***************************** DATABASE ******************************
+//*********************************************************************
 
-//***************************** DATABASE *****************************
+//*********************************************************************
 //***************************** EMBEDDING *****************************
-export const embeddingDocumentByIdMutationFn = async (doc_id: string) => {
+//*********************************************************************
+const embeddingDocumentByIdMutationFn = async (doc_id: string) => {
   const res = await API.post(`embed/document/${doc_id}`)
   return res.data
 }
-//***************************** PARSING *****************************
-export const parseDocMutationFn = async (document_id: string, parser = 'docling') => {
+
+//*********************************************************************
+//***************************** PARSING *******************************
+//*********************************************************************
+const parseDocMutationFn = async (document_id: string, parser = 'docling') => {
   const response = await API.post('parses', { document_id: document_id, parser })
   return response.data
 }
-export const getParsersQueryFn = async () => {
+const getParsersQueryFn = async () => {
   const response = await API.get('parsers')
   return response.data
 }
-export const getParsingTasksQueryFn = async () => {
+const getParsingTasksQueryFn = async () => {
   const response = await API.get('parsing/tasks')
   return response.data
 }
-export const getParsingTaskStatusByIdQueryFn = async (task_id: string) => {
+const getParsingTaskStatusByIdQueryFn = async (task_id: string) => {
   const response = await API.get(`parsing/tasks/${task_id}`)
   return response.data
+}
+
+//*********************************************************************
+//***************************** AUTH **********************************
+//*********************************************************************
+
+const signUpMutationFn = async (
+  email: string,
+  password: string,
+  userData?: Record<string, unknown>
+): Promise<{ user: User }> => {
+  const payload = {
+    email,
+    password,
+    metadata: userData
+  }
+  const response = await API.post('auth/signup', payload)
+  return response.data
+}
+const getRefreshTokenQueryFn = async (
+  currentRefreshToken: string
+): Promise<{ access_token: string; refresh_token: string }> => {
+  const response = await API.post(`/auth/refresh`, {
+    refresh_token: currentRefreshToken
+  })
+  return response.data
+}
+const loginQueryFn = async (email: string, password: string) => {
+  const resposne = await API.post('/auth/signin', { email, password })
+  return resposne.data
+}
+const logoutQueryFn = async () => {
+  const response = await API.get('auth/signout')
+  return response.data
+}
+
+export {
+  ingestionMutationFn,
+  ingestionQueryFn,
+  ingestionByIdQueryFn,
+  ingestionTasksQueryFn,
+  ingestionDeleteMutationFn,
+  handleChatStream,
+  sendMessage,
+  embeddingDocumentByIdMutationFn,
+  parseDocMutationFn,
+  getParsersQueryFn,
+  getParsingTasksQueryFn,
+  getParsingTaskStatusByIdQueryFn,
+  logoutQueryFn,
+  loginQueryFn,
+  getRefreshTokenQueryFn,
+  signUpMutationFn
 }

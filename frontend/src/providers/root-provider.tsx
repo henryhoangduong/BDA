@@ -6,6 +6,7 @@ import { toast } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
 import { Worker } from '@react-pdf-viewer/core'
 import { Toaster as SonnerToaster } from '@/components/ui/sonner'
+import { AuthProvider } from '@/context/AuthContext'
 const RootProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = new QueryClient()
   useEffect(() => {
@@ -18,11 +19,13 @@ const RootProvider = ({ children }: { children: ReactNode }) => {
   }, [])
   return (
     <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
-        <Worker workerUrl='https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js'>{children} </Worker>
-        <Toaster />
-        <SonnerToaster />
-      </SidebarProvider>
+      <AuthProvider>
+        <SidebarProvider>
+          <Worker workerUrl='https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js'>{children} </Worker>
+          <Toaster />
+          <SonnerToaster />
+        </SidebarProvider>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }
