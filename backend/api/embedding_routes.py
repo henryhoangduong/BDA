@@ -1,7 +1,9 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException
+
 from services.embeddings.embedding_service import EmbeddingService
+
 embedding_route = APIRouter()
 
 # Initialize the embedding service
@@ -18,12 +20,13 @@ async def embed_documents():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@embedding_route.post("/embed/document")
+@embedding_route.post("/embed/document/{doc_id}")
 async def embed_document(doc_id: str):
     """Embed a specific document into the vector store."""
     try:
-        langchain_documents = embedding_service.embed_document(doc_id)
+        langchain_documents = await embedding_service.embed_document(doc_id)
         return langchain_documents
+        return
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:

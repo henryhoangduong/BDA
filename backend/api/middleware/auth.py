@@ -3,11 +3,12 @@ from typing import Optional, Union
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, APIKeyHeader
+from fastapi.security import (APIKeyHeader, HTTPAuthorizationCredentials,
+                              HTTPBearer)
 
+from services.auth.api_key_service import APIKeyService
 from services.auth.auth_service import AuthService
 from services.auth.role_service import RoleService
-from services.auth.api_key_service import APIKeyService
 from services.auth.supabase_client import get_supabase_client
 
 logger = logging.getLogger(__name__)

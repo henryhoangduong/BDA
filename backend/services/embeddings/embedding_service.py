@@ -19,7 +19,7 @@ class EmbeddingService:
         self.database = get_database()
         self.splitter = Splitter(chunk_size=5000, chunk_overlap=300)
 
-    def embed_all_documents(self) -> List[Document]:
+    async def embed_all_documents(self) -> List[Document]:
         """
         Embed all documents in the database into the vector store.
 
@@ -52,7 +52,7 @@ class EmbeddingService:
             logger.error(f"Error embedding all documents: {str(e)}")
             raise
 
-    def embed_document(self, doc_id: str) -> List[Document]:
+    async def embed_document(self, doc_id: str) -> List[Document]:
         """
         Embed a specific document into the vector store.
 
@@ -70,11 +70,8 @@ class EmbeddingService:
 
             langchain_documents = simbadoc.documents
 
-            langchain_documents = self.splitter.split_document(langchain_documents)
-
-            # Clean documents
-            langchain_documents = _clean_documents(langchain_documents)
-
+            langchain_documents = self.splitter.split_document(
+                langchain_documents)
             try:
                 # Add documents to vector store
                 self.vector_store.add_documents(

@@ -9,10 +9,9 @@ from uuid import UUID
 from fastapi import HTTPException, status
 
 from database.postgres import PostgresDB
+from models.api_key import APIKeyCreate, APIKeyInfo, APIKeyResponse
 from services.auth.supabase_client import get_supabase_client
-from models.api_key import APIKeyCreate, APIKeyResponse, APIKeyInfo
 from services.roles.role_services import RoleService
-from services.auth.supabase_client import get_supabase_client
 
 logger = logging.getLogger(__name__)
 

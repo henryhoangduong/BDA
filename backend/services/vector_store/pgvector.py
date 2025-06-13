@@ -117,7 +117,8 @@ class PGVectorStore(VectorStore):
         try:
             session = self._Session()
             doc = (
-                session.query(SQLDocument).filter(SQLDocument.id == document_id).first()
+                session.query(SQLDocument).filter(
+                    SQLDocument.id == document_id).first()
             )
             return doc.to_simbadoc() if doc else None
         finally:
@@ -137,22 +138,25 @@ class PGVectorStore(VectorStore):
         """Add documents to the store using SQLAlchemy ORM."""
         session = None
         try:
+            print("add_document")
             session = self._Session()
 
             # Check if document exists
             existing_doc = (
-                session.query(SQLDocument).filter(SQLDocument.id == document_id).first()
+                session.query(SQLDocument).filter(
+                    SQLDocument.id == document_id).first()
             )
             if not existing_doc:
                 raise ValueError(f"Parent document {document_id} not found")
 
             # Get user_id from the document
             user_id = str(existing_doc.user_id)
-
+            print("user_id: ", user_id)
             # Generate embeddings for all documents
             texts = [doc.page_content for doc in documents]
+            print("texts = [doc.page_content for doc in documents]")
             embeddings = self.embeddings.embed_documents(texts)
-
+            print("embeddings = self.embeddings.embed_documents(texts)")
             # Create ChunkEmbedding objects and explicitly set their IDs
             chunk_objects = []
             for doc, embedding in zip(documents, embeddings):
@@ -160,11 +164,12 @@ class PGVectorStore(VectorStore):
                     id=doc.id,  # Use the LangChain document's ID directly
                     document_id=document_id,
                     user_id=user_id,
-                    data={"page_content": doc.page_content, "metadata": doc.metadata},
+                    data={"page_content": doc.page_content,
+                          "metadata": doc.metadata},
                     embedding=embedding,
                 )
                 chunk_objects.append(chunk)
-
+            print("done loop")
             # Add all chunks to session
             session.add_all(chunk_objects)
             session.commit()
@@ -497,7 +502,8 @@ class PGVectorStore(VectorStore):
         if self._bm25_retriever is None or self._bm25_docs is None:
             # Get all documents for this user
             self._bm25_docs = self.get_all_documents(user_id=user_id)
-            logger.debug(f"Initialized BM25 with {len(self._bm25_docs)} documents")
+            logger.debug(
+                f"Initialized BM25 with {len(self._bm25_docs)} documents")
 
             # Initialize BM25 retriever
             self._bm25_retriever = BM25Retriever.from_documents(
@@ -602,7 +608,8 @@ class PGVectorStore(VectorStore):
 
             # Check if document exists
             existing_doc = (
-                session.query(SQLDocument).filter(SQLDocument.id == document_id).first()
+                session.query(SQLDocument).filter(
+                    SQLDocument.id == document_id).first()
             )
             if not existing_doc:
                 raise ValueError(f"Parent document {document_id} not found")

@@ -4,21 +4,22 @@ import logging
 import os
 import uuid
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import aiofiles
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, Body
+from fastapi import (APIRouter, Body, Depends, File, HTTPException, Query,
+                     UploadFile)
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
+from api.middleware.auth import get_current_user
 from core.config import settings
 from core.factories.database_factory import get_database
 from core.factories.vector_store_factory import VectorStoreFactory
-from services.ingestion.loader import Loader
+from models.simbadoc import SimbaDoc
 from services.ingestion.document_ingestion import DocumentIngestionService
 from services.ingestion.file_handling import save_file_locally
-from models.simbadoc import SimbaDoc
-from api.middleware.auth import get_current_user
-from pydantic import BaseModel
+from services.ingestion.loader import Loader
 
 logger = logging.getLogger(__name__)
 

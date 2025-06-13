@@ -3,8 +3,8 @@ from typing import cast
 from fastapi import APIRouter
 
 from core.factories.database_factory import get_database
-from services.ingestion.document_ingestion import DocumentIngestionService
 from models.simbadoc import SimbaDoc
+from services.ingestion.document_ingestion import DocumentIngestionService
 
 database_route = APIRouter(prefix="/database", tags=["database"])
 
