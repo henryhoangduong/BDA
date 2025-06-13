@@ -141,3 +141,23 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get user information"
         )
+
+
+@auth_router.post("/signout", status_code=status.HTTP_200_OK)
+async def signout():
+    """Sign out a user"""
+    try:
+        await AuthService.sign_out()
+        return {"message": "Successfully signed out"}
+    except ValueError as e:
+        logger.error(f"Signout error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error during signout: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )

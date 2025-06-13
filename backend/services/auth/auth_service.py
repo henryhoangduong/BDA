@@ -130,3 +130,25 @@ class AuthService:
         except Exception as e:
             logger.error(f"Failed to refresh token: {str(e)}")
             raise ValueError(f"Token refresh failed: {str(e)}")
+
+    async def sign_out(access_token: Optional[str] = None) -> None:
+        try:
+            supabase = get_supabase_client()
+
+            if access_token:
+                # Sign out specific session
+                response = supabase.auth.sign_out(access_token)
+            else:
+                # Sign out current session
+                response = supabase.auth.sign_out()
+
+            if hasattr(response, 'error') and response.error:
+                raise ValueError(
+                    f"Failed to sign out: {response.error.message}")
+
+            logger.info("User signed out successfully")
+        except ValueError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to sign out: {str(e)}")
+            raise ValueError(f"Sign out failed: {str(e)}")
