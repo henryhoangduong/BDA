@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { signIn, signOut, signUp, resetPassword, isAuthenticated, refreshToken } from '@/lib/supabase'
 import { Navigate } from 'react-router-dom'
+import { toast } from '@/hooks/use-toast'
 
 type User = {
   id: string
@@ -104,6 +105,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null)
     try {
       const data = await signUp({ email, password, userData })
+      toast({
+        variant: 'default',
+        title: 'Email',
+        description: 'Please check your email'
+      })
       setUser(data)
     } catch (err: any) {
       setError(err.message)
