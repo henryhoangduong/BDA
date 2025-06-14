@@ -56,7 +56,7 @@ jobs:
                   --build-arg UPSTASH_REDIS_PASSWORD=${{ secrets.UPSTASH_REDIS_PASSWORD }} \
                   --build-arg UPSTASH_REDIS_PORT=${{ secrets.UPSTASH_REDIS_PORT }} \
                   --build-arg FRONTEND_ORIGIN=${{ secrets.FRONTEND_ORIGIN }} \
-                  --build-arg DEVICE=${{ secrets.DEVICE}}
+                  --build-arg DEVICE=${{ secrets.DEVICE}} \
                   -t henryhoangduong/bda-backend:latest \
                   ./backend
             - name: Publish image to docker hub
