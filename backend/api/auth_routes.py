@@ -1,13 +1,15 @@
 import logging
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from pydantic import BaseModel, Field
 
 from api.middleware.auth import get_current_user
 from models.role import Permission, Role
 from services.auth.auth_service import AuthService
 from services.roles.role_services import RoleService
+from core.config import settings
+from fastapi.responses import RedirectResponse
 
 logger = logging.getLogger(__name__)
 
@@ -161,3 +163,31 @@ async def signout():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred"
         )
+
+
+@auth_router.get("/verify")
+async def verify_user():
+    # access_token = request.query_params.get("access_token")
+    # if not access_token:
+    #     raise HTTPException(status_code=400, detail="Missing access token")
+
+    # headers = {
+    #     "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+    #     "apikey": SUPABASE_ANON_KEY,
+    # }
+
+    # async with httpx.AsyncClient() as client:
+    #     resp = await client.get(
+    #         f"{SUPABASE_URL}/auth/v1/user",
+    #         headers={"Authorization": f"Bearer {access_token}"}
+    #     )
+
+    # if resp.status_code != 200:
+    #     raise HTTPException(
+    #         status_code=401, detail="Invalid or expired access token")
+
+    # # Optionally do more with user info: user_id = resp.json()["id"]
+
+    # # Redirect to frontend login
+    redirect_url = f"{settings.frontend_origin}/auth/login"
+    return RedirectResponse(url=redirect_url)
