@@ -1,14 +1,9 @@
 import logging
 import os
-import shlex
-import subprocess
 from datetime import datetime
-from pathlib import Path
 from typing import List, Union
 
 import torch
-from langchain.schema import Document
-from pydantic import BaseModel
 
 from core.factories.vector_store_factory import VectorStoreFactory
 from models.simbadoc import SimbaDoc
@@ -19,9 +14,7 @@ import uuid
 
 from docling.chunking import HybridChunker
 from langchain_docling import DoclingLoader
-from langchain_docling.loader import ExportType
 
-from core.config import settings
 
 
 class ParserService:

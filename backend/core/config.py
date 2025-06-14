@@ -109,7 +109,7 @@ class EmbeddingConfig(BaseModel):
 
     provider: str = "openai"
     model_name: str = "text-embedding-3-small"
-    device: str = "cpu"
+    device: str = os.getenv("DEVICE")
 
     additional_params: Dict[str, Any] = Field(default_factory=dict)
 
@@ -285,7 +285,7 @@ class Settings(BaseSettings):
     storage: StorageSettings = StorageSettings()
     supabase: SupabaseSettings = SupabaseSettings()
     postgres: PostgresSettings = PostgresSettings()
-    frontend_origin:str = os.getenv("FRONTEND_ORIGIN")
+    frontend_origin: str = os.getenv("FRONTEND_ORIGIN")
 
     @field_validator("celery")
     @classmethod

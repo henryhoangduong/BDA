@@ -21,7 +21,7 @@ llm:
 embedding:
   provider: "huggingface"
   model_name: "sentence-transformers/all-MiniLM-L6-v2"
-  device: "mps"  # Changed from mps to cpu for container compatibility
+  # device: read from environment variable
   additional_params: {}
 
 vector_store:
