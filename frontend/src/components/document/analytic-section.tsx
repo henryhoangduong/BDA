@@ -10,7 +10,7 @@ const AnalyticSection = () => {
     queryFn: ingestionQueryFn
   })
   return (
-    <div className='grid grid-cols-4 gap-2'>
+    <div className='grid md:grid-cols-4 gap-2 sm:grid-cols-1'>
       <Card>
         <CardHeader className='flex flex-row items-center  gap-2'>
           <Database className='text-muted-foreground' />

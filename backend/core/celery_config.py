@@ -40,6 +40,13 @@ def get_celery_config():
         "task_time_limit": 3600,  # 1 hour time limit per task
         "task_soft_time_limit": 3000,  # 50 minutes soft time limit,
         "worker_shutdown_timeout": 10,  # Give tasks 10 seconds to clean up
+        "imports": [
+            "tasks.parsing_tasks",
+        ],
+        "task_routes": {
+            "parse_markitdown": {"queue": "parsing"},
+            "parse_docling": {"queue": "parsing"},
+        },
     }
 
 

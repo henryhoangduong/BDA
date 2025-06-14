@@ -21,7 +21,7 @@ const FileInformation = ({ trigger, doc_id }: Props) => {
   return (
     <Sheet>
       <SheetTrigger>{trigger}</SheetTrigger>
-      <SheetContent className='overflow-y-auto flex flex-col items-start'>
+      <SheetContent className='overflow-y-auto flex flex-col items-start md:w-[70%] w-full'>
         <SheetHeader>
           <SheetTitle>File Information</SheetTitle>
           <SheetDescription>File information including name, chunk, size ...</SheetDescription>

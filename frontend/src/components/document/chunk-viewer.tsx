@@ -10,7 +10,7 @@ interface Props {
 }
 export const ChunkViewer = ({ documents }: Props) => {
   return (
-    <Card className='w-full max-w-2xl'>
+    <Card className='max-w-4xl'>
       <CardHeader>
         <CardTitle>Chunk Viewer</CardTitle>
         <CardDescription>View and copy your JSON data.</CardDescription>
