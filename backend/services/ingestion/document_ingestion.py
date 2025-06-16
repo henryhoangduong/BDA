@@ -42,6 +42,7 @@ class DocumentIngestionService:
             print("file_path: ", file_path)
             file_extension = f".{file.filename.split('.')[-1].lower()}"
             saved_local_path = await self.storage.save_file(file_path, file)
+            saved_remote_path = await self.storage.get_public_url(file_path)
             file_size = saved_local_path.stat().st_size
             if file_size == 0:
                 raise ValueError(f"File {saved_local_path} is empty")
@@ -60,7 +61,7 @@ class DocumentIngestionService:
                 size=size_str,
                 loader=self.loader.__name__,
                 uploadedAt=datetime.now().isoformat(),
-                file_path=f"{settings.storage.supabase_bucket}/{file.filename}",
+                file_path=saved_remote_path,
                 parser=None,
             )
 

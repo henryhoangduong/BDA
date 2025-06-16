@@ -152,6 +152,7 @@ class SupabaseStorageProvider(StorageProvider):
     async def get_public_url(self, file_path: Path) -> bool:
         try:
             object_name = str(file_path).replace("\\", "/")
+            print()
             publicUrl = self.client.storage.from_(
                 self.bucket).get_public_url(object_name)
             logger.info(

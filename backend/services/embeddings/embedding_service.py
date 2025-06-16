@@ -52,7 +52,7 @@ class EmbeddingService:
             logger.error(f"Error embedding all documents: {str(e)}")
             raise
 
-    async def embed_document(self, doc_id: str) -> List[Document]:
+    def embed_document(self, doc_id: str) -> List[Document]:
         """
         Embed a specific document into the vector store.
 

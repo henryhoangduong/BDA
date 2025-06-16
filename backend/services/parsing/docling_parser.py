@@ -8,6 +8,8 @@ from langchain_docling import DoclingLoader
 from core.config import settings
 from models.simbadoc import SimbaDoc
 from services.parsing.base import BaseParser
+import logging
+logger = logging.getLogger(__name__)
 
 
 class DoclingParser(BaseParser):
@@ -41,7 +43,8 @@ class DoclingParser(BaseParser):
             )
             return new_document
 
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error parsing docling: {str(e)}")
             document.metadata.parsing_status = "FAILED"
             # Optionally, log or rethrow the error here
             return document

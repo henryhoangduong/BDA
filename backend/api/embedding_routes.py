@@ -24,7 +24,7 @@ async def embed_documents():
 async def embed_document(doc_id: str):
     """Embed a specific document into the vector store."""
     try:
-        langchain_documents = await embedding_service.embed_document(doc_id)
+        langchain_documents = embedding_service.embed_document(doc_id)
         return langchain_documents
         return
     except ValueError as e:
