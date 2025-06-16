@@ -43,7 +43,9 @@ def get_llm(LLM: Optional[LLMConfig] = None):
         return ChatGoogleGenerativeAI(
             model=settings.llm.model_name,
             temperature=settings.llm.temperature,
-            streaming=settings.llm.streaming,
+            model_kwargs={
+                "streaming": settings.llm.streaming,
+            }
         )
     elif settings.llm.provider == "anthropic":
         return """ChatAnthropic(

@@ -69,7 +69,6 @@ class SupabaseStorageProvider(StorageProvider):
                 result = self.client.storage.from_(self.bucket).upload(
                     object_name, f, {"content-type": file.content_type}
                 )
-
             # Reset file pointer for subsequent reads
             await file.seek(0)
 
@@ -94,7 +93,8 @@ class SupabaseStorageProvider(StorageProvider):
 
             # If not, get from Supabase
             object_name = str(file_path).replace("\\", "/")
-            response = self.client.storage.from_(self.bucket).download(object_name)
+            response = self.client.storage.from_(
+                self.bucket).download(object_name)
             return response
 
         except Exception as e:
@@ -109,7 +109,8 @@ class SupabaseStorageProvider(StorageProvider):
             logger.info(f"Found file with object name: {object_name}")
 
             try:
-                res = self.client.storage.from_(self.bucket).remove([object_name])
+                res = self.client.storage.from_(
+                    self.bucket).remove([object_name])
                 logger.info(
                     f"Response after deleting file from supabase storage: {res}"
                 )
@@ -144,5 +145,20 @@ class SupabaseStorageProvider(StorageProvider):
             return True
 
         except Exception as e:
-            logger.error(f"Error checking file existence in Supabase: {str(e)}")
+            logger.error(
+                f"Error checking file existence in Supabase: {str(e)}")
+            return False
+
+    async def get_public_url(self, file_path: Path) -> bool:
+        try:
+            object_name = str(file_path).replace("\\", "/")
+            publicUrl = self.client.storage.from_(
+                self.bucket).get_public_url(object_name)
+            logger.info(
+                f"Response after getting public url file supabase storage: {publicUrl}"
+            )
+            return publicUrl
+        except Exception as e:
+            logger.error(
+                f"Error getting public url: {str(e)}")
             return False

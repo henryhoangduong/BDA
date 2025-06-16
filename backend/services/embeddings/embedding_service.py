@@ -93,3 +93,30 @@ class EmbeddingService:
         except Exception as e:
             logger.error(f"Error embedding document {doc_id}: {str(e)}")
             raise
+
+    async def delete_document(self, doc_id: str) -> Dict[str, str]:
+        """
+        Delete all chunks of a document from the vector store.
+
+        Args:
+            doc_id: Document ID to delete
+
+        Returns:
+            Dictionary with status message
+        """
+        try:
+            simbadoc: SimbaDoc = self.database.get_document(doc_id)
+            if not simbadoc:
+                raise ValueError(f"Document {doc_id} not found")
+
+            # docs_ids: List[str] = [doc.id for doc in simbadoc.documents]
+            self.vector_store.delete_documents(doc_id)
+
+            # Update document status
+            simbadoc.metadata.enabled = False
+            self.database.update_document(doc_id, simbadoc)
+
+            return {"message": f"Document {doc_id} deleted from vector store"}
+        except Exception as e:
+            logger.error(f"Error deleting document {doc_id}: {str(e)}")
+            raise

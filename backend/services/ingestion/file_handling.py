@@ -37,3 +37,12 @@ def delete_file_locally(file_path: Path):
     if os.path.exists(file_path):
         os.remove(file_path)
     return True
+
+
+def delete_file_locally(file_path: Path):
+    """
+    Deletes the file from the local filesystem
+    """
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    return True

@@ -14,8 +14,7 @@ from fastapi.responses import RedirectResponse
 logger = logging.getLogger(__name__)
 
 auth_router = APIRouter(
-    prefix=f"/api/auth",
-    tags=["auth"],
+
 )
 
 

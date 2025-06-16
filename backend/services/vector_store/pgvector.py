@@ -662,3 +662,28 @@ class PGVectorStore(VectorStore):
         finally:
             if session:
                 session.close()
+
+    def delete_documents(self, doc_id: str) -> bool:
+        session = None
+        try:
+            user_id = supabase.auth.get_user().user.id
+            doc = session.query(SQLDocument).filter(
+                SQLDocument.id == doc_id, SQLDocument.user_id == user_id).first()
+            if not doc:
+                raise ValueError(
+                    f"User {user_id} does not have access to document {doc_id}")
+            query = session.query(ChunkEmbedding).filter(
+                ChunkEmbedding.document_id == doc_id)
+            deleted_count = query.delete(synchronize_session=False)
+            session.commit()
+
+            logger.info(f"Successfully deleted {deleted_count} chunks")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to delete documents: {e}")
+            if session:
+                session.rollback()
+            return False
+        finally:
+            if session:
+                session.close()

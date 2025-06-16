@@ -17,8 +17,11 @@ from models.simbadoc import MetadataType, SimbaDoc
 from services.ingestion.loader import Loader
 from services.splitting.splitter import Splitter
 from services.storage.base import StorageProvider
+from services.auth.supabase_client import get_supabase_client
 
+from services.ingestion.file_handling import delete_file_locally
 logger = logging.getLogger(__name__)
+supabase = get_supabase_client()
 
 
 class DocumentIngestionService:
@@ -36,12 +39,13 @@ class DocumentIngestionService:
             from tasks.generate_summary import generate_summary_task
 
             file_path = Path(folder_path.strip("/")) / file.filename
+            print("file_path: ", file_path)
             file_extension = f".{file.filename.split('.')[-1].lower()}"
-            saved_path = await self.storage.save_file(file_path, file)
-            file_size = saved_path.stat().st_size
+            saved_local_path = await self.storage.save_file(file_path, file)
+            file_size = saved_local_path.stat().st_size
             if file_size == 0:
-                raise ValueError(f"File {saved_path} is empty")
-            document = await self.loader.aload(file_path=str(saved_path))
+                raise ValueError(f"File {saved_local_path} is empty")
+            document = await self.loader.aload(file_path=str(saved_local_path))
             document = await asyncio.to_thread(self.splitter.split_document, document)
             for doc in document:
                 doc.id = str(uuid.uuid4())
@@ -56,7 +60,7 @@ class DocumentIngestionService:
                 size=size_str,
                 loader=self.loader.__name__,
                 uploadedAt=datetime.now().isoformat(),
-                file_path=str(saved_path),
+                file_path=f"{settings.storage.supabase_bucket}/{file.filename}",
                 parser=None,
             )
 
@@ -67,4 +71,19 @@ class DocumentIngestionService:
             return simbadoc
         except Exception as e:
             logger.error(f"Error ingesting document: {e}")
+            raise e
+
+    async def delete_ingested_document(self, uid: str, delete_locally: bool = False) -> int:
+        try:
+
+            if delete_locally:
+                doc = self.vector_store.get_document(uid)
+                delete_file_locally(Path(doc.metadata.get("file_path")))
+
+            self.vector_store.delete_documents([uid])
+
+            return {"message": f"Document {uid} deleted successfully"}
+
+        except Exception as e:
+            logger.error(f"Error deleting document {uid}: {e}")
             raise e

@@ -193,7 +193,8 @@ class PostgresDB(DatabaseService):
                     cursor.execute(query, params or ())
                     row = cursor.fetchone()
                     if row:
-                        logger.info(f"Query returned a row with id: {row.get('id')}")
+                        logger.info(
+                            f"Query returned a row with id: {row.get('id')}")
                         return dict(row)
                     else:
                         logger.warning("Query returned no results")
@@ -230,7 +231,8 @@ class PostgresDB(DatabaseService):
 
         try:
             session = self._Session()
-            db_docs = [SQLDocument.from_simbadoc(doc, user_id) for doc in documents]
+            db_docs = [SQLDocument.from_simbadoc(
+                doc, user_id) for doc in documents]
             session.add_all(db_docs)
             session.commit()
             return [doc.id for doc in documents]
@@ -261,11 +263,13 @@ class PostgresDB(DatabaseService):
                 doc_map = {doc.id: doc for doc in docs}
                 # Return in the same order as input list, None if not found
                 return [
-                    doc_map.get(doc_id).to_simbadoc() if doc_map.get(doc_id) else None
+                    doc_map.get(doc_id).to_simbadoc(
+                    ) if doc_map.get(doc_id) else None
                     for doc_id in document_id
                 ]
             else:
-                query = session.query(SQLDocument).filter(SQLDocument.id == document_id)
+                query = session.query(SQLDocument).filter(
+                    SQLDocument.id == document_id)
                 if user_id:
                     query = query.filter(SQLDocument.user_id == user_id)
                 doc = query.first()
@@ -308,7 +312,8 @@ class PostgresDB(DatabaseService):
             )
 
             # Build query
-            query = session.query(SQLDocument).filter(SQLDocument.id == document_id)
+            query = session.query(SQLDocument).filter(
+                SQLDocument.id == document_id)
 
             # Filter by user_id if provided
             if user_id:
@@ -324,13 +329,14 @@ class PostgresDB(DatabaseService):
         finally:
             session.close()
 
-    def delete_document(self, document_id: str, user_id: str = None) -> bool:
+    async def delete_document(self, document_id: str, user_id: str = None) -> bool:
         """Delete a document using SQLAlchemy ORM."""
         try:
             session = self._Session()
 
             # Build query
-            query = session.query(SQLDocument).filter(SQLDocument.id == document_id)
+            query = session.query(SQLDocument).filter(
+                SQLDocument.id == document_id)
 
             # Filter by user_id if provided
             if user_id:
@@ -409,7 +415,8 @@ class PostgresDB(DatabaseService):
                     # Handle nested JSON filters using PostgreSQL JSON operators
                     path_parts = key.split(".")
                     # Build the JSON path operator
-                    json_path_str = "->".join([f"'{part}'" for part in path_parts[:-1]])
+                    json_path_str = "->".join(
+                        [f"'{part}'" for part in path_parts[:-1]])
                     if json_path_str:
                         json_path_str += "->>"
                     else:

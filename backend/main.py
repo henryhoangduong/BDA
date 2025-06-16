@@ -13,6 +13,7 @@ from api.dataset_routes import dataset_route
 from api.embedding_routes import embedding_route
 from api.ingestion_routes import ingestion
 from api.parsing_routes import parsing
+from api.document_routes import document_route
 from core.config import settings
 from core.utils.logger import setup_logging
 
@@ -84,7 +85,8 @@ app.include_router(parsing, tags=["Parse"], prefix="/api")
 app.include_router(ingestion, tags=["Ingestion"], prefix="/api")
 app.include_router(embedding_route, tags=["Embedding"], prefix="/api")
 app.include_router(chat, tags=["Chat"], prefix="/api")
-app.include_router(auth_router)
+app.include_router(auth_router,  prefix=f"/api/auth", tags=["Auth"],)
+app.include_router(document_route, tags=["Document"], prefix="/api")
 # app.include_router(database_route, tags=["Database"], prefix="/api")
 # app.include_router(dataset_route, tags=["Dataset"], prefix="/api")
 
