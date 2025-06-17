@@ -74,7 +74,13 @@ const ParsingStatus = ({ document_id }: { document_id: string }) => {
           </Badge>
         </div>
       )}
-
+      {data?.metadata.parsing_status === 'FAILED' && !isParsing && (
+        <div onClick={handleParsing} className='cursor-pointer'>
+          <Badge variant='destructive' className='w-max'>
+            {data.metadata.parsing_status}
+          </Badge>
+        </div>
+      )}
       {data?.metadata.parsing_status === 'SUCCESS' && !isParsing && (
         <Badge variant='success' className='w-max'>
           {data.metadata.parsing_status}

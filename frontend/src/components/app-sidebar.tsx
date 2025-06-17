@@ -1,4 +1,15 @@
-import { Table, Terminal, PlugZap, Key, Settings, MessageCircle, Database, EllipsisIcon, LogOut } from 'lucide-react'
+import {
+  Table,
+  Terminal,
+  PlugZap,
+  Key,
+  Settings,
+  MessageCircle,
+  Database,
+  EllipsisIcon,
+  LogOut,
+  HomeIcon
+} from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +23,7 @@ import {
   SidebarFooter
 } from '@/components/ui/sidebar'
 import logo from '@/assets/logo/logo.svg'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate, useNavigation } from 'react-router-dom'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 const sidebarItems = [
@@ -24,19 +35,38 @@ const bottomItems = [{ title: 'Settings', icon: Settings, url: '/settings' }]
 const AppSidebar = () => {
   const path = useLocation()
   const { user, signOut } = useAuth()
-
+  const navigate = useNavigate()
   if (path.pathname.startsWith('/auth')) {
     return
   }
   return (
     <Sidebar>
-      <SidebarHeader className='flex flex-row gap-2 items-center'>
+      <SidebarHeader
+        className='flex flex-row gap-2 items-center cursor-pointer'
+        onClick={() => {
+          navigate('/')
+        }}
+      >
         <img src={logo} alt='logo' className='w-7' />
         <p className='text-3xl font-medium'>BDA</p>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem key='overview'>
+                <SidebarMenuButton asChild>
+                  <a href='/overview'>
+                    <HomeIcon />
+                    <span>Overview</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarItems.map((item) => (

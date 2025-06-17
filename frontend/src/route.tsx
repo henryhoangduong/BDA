@@ -6,6 +6,7 @@ import SettingPage from './pages/setting.page'
 import SignupPage from './pages/auth/signup.page'
 import { ProtectedRoute } from './context/AuthContext'
 import LoginPage from './pages/auth/login.page'
+import OverviewPage from './pages/overview.page'
 
 export const AppRoutes = () => {
   return (
@@ -24,6 +25,14 @@ export const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <DocumentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/overview'
+          element={
+            <ProtectedRoute>
+              <OverviewPage />
             </ProtectedRoute>
           }
         />

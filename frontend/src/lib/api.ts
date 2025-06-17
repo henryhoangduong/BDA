@@ -186,7 +186,13 @@ const logoutQueryFn = async () => {
   const response = await API.get('auth/signout')
   return response.data
 }
-
+//*********************************************************************
+//***************************** DOCUMENT ******************************
+//*********************************************************************
+const deleteFileMutationFn = async (doc_id: string) => {
+  const resposne = await API.delete(`document/${doc_id}`)
+  return resposne.data
+}
 export {
   ingestionMutationFn,
   ingestionQueryFn,
@@ -203,5 +209,6 @@ export {
   logoutQueryFn,
   loginQueryFn,
   getRefreshTokenQueryFn,
-  signUpMutationFn
+  signUpMutationFn,
+  deleteFileMutationFn
 }

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ingestionDeleteMutationFn } from '@/lib/api'
+import { deleteFileMutationFn, ingestionDeleteMutationFn } from '@/lib/api'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Trash2Icon } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
@@ -9,12 +9,12 @@ interface Props {
 }
 const FileActions = ({ doc_id }: Props) => {
   const { mutate, isPending } = useMutation({
-    mutationFn: ingestionDeleteMutationFn
+    mutationFn: deleteFileMutationFn
   })
   const queryClient = useQueryClient()
   const onDelete = () => {
     if (isPending) return
-    mutate([doc_id], {
+    mutate(doc_id, {
       onSuccess: () => {
         toast({
           variant: 'default',

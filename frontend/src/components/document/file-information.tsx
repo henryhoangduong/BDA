@@ -52,6 +52,17 @@ const FileInformation = ({ trigger, doc_id }: Props) => {
               <dt className='font-medium text-sm text-gray-700'>Size: </dt>
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.metadata.size}</dd>
 
+              <dt className='font-medium text-sm text-gray-700'>Public URL: </dt>
+              <a
+                href={data?.metadata.file_path}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-sm font-semibold text-muted-foreground block w-full truncate hover:underline'
+                title={data?.metadata.file_path} // Tooltip on hover
+              >
+                {data?.metadata.file_path}
+              </a>
+
               <dt className='font-medium text-sm text-gray-700'>Total Chunks: </dt>
               <dd className='text-sm font-semibold text-muted-foreground'>{data?.documents.length}</dd>
 
